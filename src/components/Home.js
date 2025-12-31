@@ -16,14 +16,13 @@ export default function Home() {
             } else {
                 // Valid Mock Config
                 const mockConfig = `[Interface]
-                PrivateKey = yAnz5TF+lXXJte14tji3zlMNq+hd2rYUIgJBgHB3sWM=
+                PrivateKey = cA7jK3rZNT9JDbo7/l5fHghWE1/ac3Cfvn7VI8cTgEY=
                 Address = 10.0.0.2/24
-                DNS = 8.8.8.8
 
                 [Peer]
-                PublicKey = bmXOC+pV1u3zDad9eTB+tKp384n/EwX0q+58HK4BDiA=
+                PublicKey = RqdFmo32waIHq/xH4Bux6XoSePJxWnuz8skYIM2+kD0=
                 AllowedIPs = 0.0.0.0/0
-                Endpoint = 127.0.0.1:51820`;
+                Endpoint = 192.168.52.134:51820`;
                 await WireGuardModule.connect("demo-tunnel", mockConfig);
                 setIsConnected(true);
             }

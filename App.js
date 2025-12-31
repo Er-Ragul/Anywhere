@@ -7,6 +7,8 @@ import Home from "./src/components/Home";
 import VPN from "./src/components/VPN";
 import Connections from "./src/components/Connections";
 import Configuration from "./src/components/Configuration";
+import Authentication from "./src/components/Authentication";
+import Profiles from './src/components/Profiles';
 
 const RootStack = createNativeStackNavigator({
   initialRouteName: 'VPN',
@@ -16,7 +18,9 @@ const RootStack = createNativeStackNavigator({
   screens: {
     VPN: VPN,
     Connection: Connections,
-    Configuration: Configuration
+    Configuration: Configuration,
+    Authentication: Authentication,
+    Profile: Profiles
   },
 });
 

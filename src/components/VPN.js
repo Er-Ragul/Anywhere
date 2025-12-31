@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   View, 
   Text, 
@@ -11,7 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { 
   Menu, 
-  Settings, 
+  Server, 
   Power, 
   ChevronRight, 
   ArrowUp, 
@@ -22,13 +22,40 @@ import {
 import { useSelector, useDispatch } from 'react-redux'
 import { add } from '../redux/variableSlice';
 import { useNavigation } from '@react-navigation/native';
+import WireGuardModule from '../wireguard/WireGuardModule';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function VPN() {
 
+  let [isConnected, setIsConnected] = useState(false)
   const value = useSelector((state) => state.variable.value)
   const navigation = useNavigation()
   const dispatch = useDispatch()
   console.log('Redux value: ', value);
+
+  const toggleConnection = async () => {
+      try {
+          if (isConnected) {
+              await WireGuardModule.disconnect("demo-tunnel");
+              setIsConnected(false);
+          } else {
+              // Valid Mock Config
+              const mockConfig = `[Interface]
+              PrivateKey = cA7jK3rZNT9JDbo7/l5fHghWE1/ac3Cfvn7VI8cTgEY=
+              Address = 10.0.0.2/24
+
+              [Peer]
+              PublicKey = RqdFmo32waIHq/xH4Bux6XoSePJxWnuz8skYIM2+kD0=
+              AllowedIPs = 0.0.0.0/0
+              Endpoint = 192.168.52.134:51820`;
+              await WireGuardModule.connect("demo-tunnel", mockConfig);
+              setIsConnected(true);
+          }
+      } catch (e) {
+          console.error(e);
+          alert("Connection Failed: " + e.message);
+      }
+  };
 
   return (
     <LinearGradient
@@ -54,8 +81,8 @@ export default function VPN() {
             Anywhere
           </Text>
 
-          <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-2xl items-center justify-center border border-zinc-700/50">
-            <Settings size={24} color="#ffffff" />
+          <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-2xl items-center justify-center border border-zinc-700/50" onPress={() => navigation.navigate('Authentication')}>
+            <Server size={24} color="#ffffff" />
           </TouchableOpacity>
         </View>
 
@@ -95,7 +122,7 @@ export default function VPN() {
                     shadowRadius: 30,
                     elevation: 15,
                   }}
-                  onPress={() => dispatch(add('Value from screen'))}
+                  onPress={toggleConnection}
                 >
                   <Power size={60} color="white" strokeWidth={2.5} />
                 </TouchableOpacity>
@@ -105,7 +132,7 @@ export default function VPN() {
 
           {/* Current Server Card */}
           <View className="px-6 mb-6">
-            <TouchableOpacity className="bg-zinc-900/60 border border-zinc-800/80 p-5 rounded-[36px] flex-row items-center">
+            <TouchableOpacity className="bg-zinc-900/60 border border-zinc-800/80 p-5 rounded-[36px] flex-row items-center" onPress={() => navigation.navigate('Connection')}>
               <View className="w-14 h-11 bg-zinc-800 rounded-xl overflow-hidden">
                 <View className="h-1/3 bg-black" />
                 <View className="h-1/3 bg-red-600" />
@@ -114,10 +141,10 @@ export default function VPN() {
               
               <View className="flex-1 ml-4">
                 <Text className="text-zinc-500 text-[10px] font-bold tracking-widest uppercase mb-0.5">
-                  Current Server
+                  Connection Profile
                 </Text>
                 <Text className="text-white text-lg font-bold">
-                  Germany - DE1
+                  Bangalore - IND
                 </Text>
               </View>
 

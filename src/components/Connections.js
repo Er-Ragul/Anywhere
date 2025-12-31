@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   View, 
   Text, 
@@ -20,8 +20,22 @@ import {
   ArrowDown,
   ArrowUp
 } from 'lucide-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Connections() {
+
+  let [profiles, setProfiles] = useState([])
+  let [power, setPower] = useState(false)
+
+  useEffect(() => {
+    savedProfiles()
+  }, [])
+
+  const savedProfiles = async() => {
+    let saved = await AsyncStorage.getItem('profiles');
+    setProfiles(JSON.parse(saved))
+  }
+
   return (
     <View className="flex-1 bg-black">
       <StatusBar barStyle="light-content" />
@@ -51,7 +65,7 @@ export default function Connections() {
           showsVerticalScrollIndicator={false}
         >
           {/* Main Connection Card */}
-          <View className="bg-zinc-800/80 rounded-[40px] p-8 mt-4">
+          <View className="bg-zinc-800/80 rounded-[10px] p-8 mt-4">
             <View className="flex-row justify-between items-start">
               <View>
                 {/* Status Badge */}
@@ -66,7 +80,7 @@ export default function Connections() {
               </View>
 
               {/* Large Toggle Switch */}
-              <TouchableOpacity className="bg-white w-20 h-12 rounded-full flex-row items-center px-1 justify-end">
+              <TouchableOpacity className={`bg-white w-20 h-12 rounded-full flex-row items-center px-1 ${power ? 'justify-end' : 'justify-start'}`} onPress={() => setPower(!power)}>
                 <View className="bg-black w-10 h-10 rounded-full items-center justify-center">
                   <Power size={18} color="white" strokeWidth={3} />
                 </View>
@@ -115,49 +129,7 @@ export default function Connections() {
           {/* Configuration List */}
           <View className="gap-y-4">
             {/* Item 1 */}
-            <TouchableOpacity className="bg-zinc-900 border border-zinc-800 p-5 rounded-[30px] flex-row items-center">
-              <View className="w-12 h-12 bg-zinc-800 rounded-2xl items-center justify-center">
-                <LayoutGrid size={22} color="white" />
-              </View>
-              <View className="flex-1 ml-4">
-                <Text className="text-white font-bold text-lg">Home Server</Text>
-                <Text className="text-zinc-500 text-xs font-mono">192.168.1.10</Text>
-              </View>
-              <View className="w-12 h-7 bg-zinc-800 rounded-full px-1 justify-center items-start">
-                <View className="w-5 h-5 bg-zinc-600 rounded-full" />
-              </View>
-            </TouchableOpacity>
-
-            {/* Item 2 */}
-            <TouchableOpacity className="bg-zinc-900 border border-zinc-800 p-5 rounded-[30px] flex-row items-center">
-              <View className="w-12 h-12 bg-zinc-800 rounded-2xl items-center justify-center">
-                <Building2 size={22} color="white" />
-              </View>
-              <View className="flex-1 ml-4">
-                <Text className="text-white font-bold text-lg">Work VPN</Text>
-                <Text className="text-zinc-500 text-xs font-mono">10.0.0.2</Text>
-              </View>
-              <View className="w-12 h-7 bg-zinc-800 rounded-full px-1 justify-center items-start">
-                <View className="w-5 h-5 bg-zinc-600 rounded-full" />
-              </View>
-            </TouchableOpacity>
-
-            {/* Item 3 */}
-            <TouchableOpacity className="bg-zinc-900 border border-zinc-800 p-5 rounded-[30px] flex-row items-center">
-              <View className="w-12 h-12 bg-zinc-800 rounded-2xl items-center justify-center">
-                <Globe size={22} color="white" />
-              </View>
-              <View className="flex-1 ml-4">
-                <Text className="text-white font-bold text-lg">Amsterdam Public</Text>
-                <Text className="text-zinc-500 text-xs font-mono">185.199.108.153</Text>
-              </View>
-              <View className="w-12 h-7 bg-zinc-800 rounded-full px-1 justify-center items-start">
-                <View className="w-5 h-5 bg-zinc-600 rounded-full" />
-              </View>
-            </TouchableOpacity>
-
-            {/* Item 4 */}
-            <TouchableOpacity className="bg-zinc-900 border border-zinc-800 p-5 rounded-[30px] flex-row items-center">
+            <TouchableOpacity className="bg-zinc-900 border border-zinc-800 p-5 rounded-[10px] flex-row items-center" onPress={() => setPower(!power)}>
               <View className="w-12 h-12 bg-zinc-800 rounded-2xl items-center justify-center">
                 <Router size={22} color="white" />
               </View>
@@ -165,7 +137,7 @@ export default function Connections() {
                 <Text className="text-white font-bold text-lg">Gaming Private Net</Text>
                 <Text className="text-zinc-500 text-xs font-mono">192.168.50.1</Text>
               </View>
-              <View className="w-12 h-7 bg-black rounded-full px-1 justify-center items-end border border-zinc-800">
+              <View className={`w-12 h-7 bg-black rounded-full px-1 justify-center ${power ? 'items-end' : 'items-start'} border border-zinc-800`}>
                 <View className="w-5 h-5 bg-white rounded-full" />
               </View>
             </TouchableOpacity>

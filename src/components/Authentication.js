@@ -1,0 +1,173 @@
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  SafeAreaView, 
+  ScrollView, 
+  KeyboardAvoidingView, 
+  Platform, 
+  StatusBar,
+  Dimensions
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { 
+  FileUp,
+  Shield, 
+  Server, 
+  Lock, 
+  EyeOff, 
+  ArrowRight 
+} from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
+
+export default function Authentication(){
+
+  const navigation = useNavigation()
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  return (
+    <View className="flex-1 bg-[#0a0a0b]">
+      {/* 
+        Ensure Status bar is translucent on Android 
+        to allow KeyboardAvoidingView to calculate offsets correctly 
+      */}
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+      
+      <LinearGradient
+        colors={['#1f2128', '#0a0a0b']}
+        className="absolute inset-0"
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 0.4 }}
+      />
+
+      <SafeAreaView className="flex-1">
+        <KeyboardAvoidingView 
+          // behavior "padding" is generally most reliable for iOS
+          // behavior "height" or undefined is often better for Android
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+          // keyboardVerticalOffset should roughly match the status bar height on Android
+          keyboardVerticalOffset={Platform.OS === 'android' ? StatusBar.currentHeight : 0}
+        >
+          <ScrollView 
+            // flexGrow: 1 is required for the inner View to expand
+            contentContainerStyle={{ flexGrow: 1 }}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {/* 
+               Inner View with flex-1 and justify-center handles the 
+               vertical centering while allowing the ScrollView to move 
+               correctly when the KeyboardAvoidingView squeezes the space.
+            */}
+            <View className="flex-1 justify-center px-7 py-10">
+              
+              {/* Logo Section */}
+              <View className="items-center mb-10">
+                <View className="w-28 h-28 bg-[#1a1b21] rounded-[32px] border border-zinc-800/50 items-center justify-center shadow-2xl">
+                  <View className="relative">
+                    <Shield size={44} color="#f4f4f5" strokeWidth={1.5} />
+                    <View className="absolute inset-0 items-center justify-center pt-1">
+                      <Lock size={18} color="#f4f4f5" strokeWidth={2.5} />
+                    </View>
+                  </View>
+                </View>
+                
+                <Text className="text-white text-4xl font-bold mt-10 tracking-tight">
+                  Anywhere Hub
+                </Text>
+                <Text className="text-zinc-500 text-lg mt-2 text-center font-medium">
+                  Secure connection to your private network
+                </Text>
+              </View>
+
+              {/* Form Section */}
+              <View className="gap-y-6">
+                {/* Server Input */}
+                <View>
+                  <Text className="text-zinc-500 text-[10px] font-bold tracking-[2px] uppercase mb-3 ml-1">
+                    SERVER FQDN / IP
+                  </Text>
+                  <View className="flex-row items-center bg-[#131418] border border-zinc-800/60 rounded-2xl px-5">
+                    <Server size={20} color="#52525b" />
+                    <TextInput
+                      placeholder="Ex: vpn.anywhere.in"
+                      placeholderTextColor="#3f3f46"
+                      className="flex-1 text-white h-16 ml-3 text-base"
+                      autoCapitalize="none"
+                      // Avoids the view jumping on Android
+                      underlineColorAndroid="transparent"
+                    />
+                  </View>
+                </View>
+
+                {/* Password Input */}
+                <View>
+                  <Text className="text-zinc-500 text-[10px] font-bold tracking-[2px] uppercase mb-3 ml-1">
+                    Password
+                  </Text>
+                  <View className="flex-row items-center bg-[#131418] border border-zinc-800/60 rounded-2xl px-5">
+                    <Lock size={20} color="#52525b" />
+                    <TextInput
+                      placeholder="Enter password"
+                      placeholderTextColor="#3f3f46"
+                      secureTextEntry={!passwordVisible}
+                      className="flex-1 text-white h-16 ml-3 text-base"
+                      underlineColorAndroid="transparent"
+                    />
+                    <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+                      <EyeOff size={20} color="#52525b" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+            
+                {/* <TouchableOpacity className="self-end">
+                    <Text className="text-blue-500 font-bold text-sm">Forgot Password?</Text>
+                </TouchableOpacity> */}
+
+                {/* Connect Button */}
+                <TouchableOpacity 
+                  activeOpacity={0.9}
+                  className="bg-white h-[56px] rounded-[24px] flex-row items-center justify-center mt-4 shadow-lg shadow-white/10"
+                  onPress={() => navigation.navigate('Profile')}
+                >
+                  <Text className="text-black text-xl font-black mr-2">Register</Text>
+                  <ArrowRight size={22} color="black" strokeWidth={3} />
+                </TouchableOpacity>
+              </View>
+        
+                {/* Divider */}
+                <View className="flex-row items-center my-10 px-4">
+                    <View className="flex-1 h-[1px] bg-zinc-800/50" />
+                    <Text className="text-zinc-600 mx-4 font-bold text-[10px] tracking-widest">OR</Text>
+                    <View className="flex-1 h-[1px] bg-zinc-800/50" />
+                </View>
+
+                {/* Import Button */}
+                <TouchableOpacity 
+                    activeOpacity={0.7}
+                    className="bg-transparent border border-zinc-800/80 h-16 rounded-[20px] flex-row items-center justify-center"
+                    onPress={() => navigation.navigate('VPN')}
+                    >
+                    {/* <FileUp size={18} color="#71717a" className="mr-3" /> */}
+                    <Text className="text-zinc-300 font-bold text-base">
+                        Back To VPN Client
+                    </Text>
+                </TouchableOpacity>
+
+              {/* Version Info */}
+              <View className="mt-12 items-center">
+                <Text className="text-zinc-700 text-xs font-semibold">
+                  Version 1.0.0
+                </Text>
+              </View>
+
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
+  );
+}

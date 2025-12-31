@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -17,12 +17,27 @@ import {
 import { X, Eye, RefreshCw, Save, QrCode } from 'lucide-react-native';
 import { useCameraPermissions, CameraView, CameraType } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Configuration() {
   let navigation = useNavigation()
   let [scan, setScan] = useState(false)
   const [scannedData, setScannedData] = useState(null);
+  let [config, setConfig] = useState({
+    name: null,
+    private_key: null,
+    address: null,
+    dns: '8.8.8.8',
+    public_key: null,
+    allowed: null,
+    endpoint: null
+  })
+  let [visible, setVisible] = useState(false)
   const [permission, requestPermission] = useCameraPermissions();
+
+  useEffect(() => {
+    console.log(config);
+  }, [config])
 
   let openQrScanner = () => {
     if(permission.granted){
@@ -39,6 +54,29 @@ export default function Configuration() {
     console.log(data);
     setScan(false)
   };
+
+  let saveConfiguration = async() => {
+    try {
+      let template = `[Interface]
+      PrivateKey = ${config.private_key}
+      Address = ${config.address}/24
+      DNS = ${config.dns}
+
+      [Peer]
+      PublicKey = ${config.public_key}
+      AllowedIPs = 0.0.0.0/0,::/0
+      PersistentKeepalive = 25
+      Endpoint = ${config.endpoint}:51820`
+
+      const profiles = JSON.stringify([{[config['name']]: template}]);
+      await AsyncStorage.setItem('profiles', profiles);
+
+      Alert.alert('Profile added successfully 👍🏻')
+      
+    } catch (e) {
+      Alert.alert('Something went wrong 😞')
+    }
+  }
 
   return (
     <ScrollView>
@@ -89,6 +127,8 @@ export default function Configuration() {
                 placeholder='US Server'
                 className="flex-1 text-slate-900 text-base"
                 placeholderTextColor="#a9a9a9"
+                value={config.name}
+                onChangeText={(value) => setConfig({...config, name: value})}
               />
             </View>
           </View>
@@ -99,17 +139,19 @@ export default function Configuration() {
             </Text>
             <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
               <TextInput 
-                secureTextEntry
-                value="1234567890123"
+                secureTextEntry={visible}
+                value={config.private_key}
                 className="flex-1 text-slate-900 text-base"
+                placeholder='bmXOC+pV1u3zDad9eTB+'
                 placeholderTextColor="#a9a9a9"
+                onChangeText={(value) => setConfig({...config, private_key: value})}
               />
-              <TouchableOpacity className="ml-3">
+              <TouchableOpacity className="ml-3" onPress={() => setVisible(!visible)}>
                 <Eye size={20} color="#64748b" />
               </TouchableOpacity>
-              <TouchableOpacity className="ml-4">
+              {/* <TouchableOpacity className="ml-4">
                 <RefreshCw size={20} color="#1e293b" />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
 
@@ -120,8 +162,10 @@ export default function Configuration() {
             <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
               <TextInput
                 placeholder='10.0.0.2/24'
+                value={config.address}
                 className="flex-1 text-slate-900 text-base"
                 placeholderTextColor="#a9a9a9"
+                onChangeText={(value) => setConfig({...config, address: value})}
               />
             </View>
           </View>
@@ -133,8 +177,10 @@ export default function Configuration() {
             <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
               <TextInput
                 placeholder='8.8.8.8, 1.1.1.1'
+                value={config.dns}
                 className="flex-1 text-slate-900 text-base"
                 placeholderTextColor="#a9a9a9"
+                onChangeText={(value) => setConfig({...config, dns: value})}
               />
             </View>
           </View>
@@ -153,9 +199,11 @@ export default function Configuration() {
             <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
               <TextInput 
                 placeholder="bmXOC+pV1u3zDad9eTB+"
+                value={config.public_key}
                 className="flex-1 text-slate-900 text-base"
                 placeholderTextColor="#a9a9a9"
                 scrollEnabled
+                onChangeText={(value) => setConfig({...config, public_key: value})}
               />
             </View>
           </View>
@@ -167,8 +215,10 @@ export default function Configuration() {
             <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
               <TextInput
                 placeholder='0.0.0.0/0,::/0'
+                value={config.allowed}
                 className="flex-1 text-slate-900 text-base"
                 placeholderTextColor="#a9a9a9"
+                onChangeText={(value) => setConfig({...config, allowed: value})}
               />
             </View>
           </View>
@@ -180,8 +230,10 @@ export default function Configuration() {
             <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
               <TextInput
                 placeholder='0.0.0.0:51820'
+                value={config.endpoint}
                 className="flex-1 text-slate-900 text-base"
                 placeholderTextColor="#a9a9a9"
+                onChangeText={(value) => setConfig({...config, endpoint: value})}
               />
             </View>
           </View>
@@ -191,6 +243,7 @@ export default function Configuration() {
           <TouchableOpacity 
             activeOpacity={0.9}
             className="bg-black rounded-2xl py-5 flex-row items-center justify-center shadow-lg shadow-black/20"
+            onPress={saveConfiguration}
           >
             <Save size={20} color="white" strokeWidth={2.5} />
             <Text className="text-white font-bold text-lg ml-2">
