@@ -14,7 +14,7 @@ import {
   KeyboardAvoidingView,
   StyleSheet
 } from 'react-native';
-import { X, Eye, RefreshCw, Save, QrCode } from 'lucide-react-native';
+import { X, Eye, EyeOff, Save, QrCode } from 'lucide-react-native';
 import { useCameraPermissions, CameraView, CameraType } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,15 +29,11 @@ export default function Configuration() {
     address: null,
     dns: '8.8.8.8',
     public_key: null,
-    allowed: null,
+    allowed: '0.0.0.0/0,::/0',
     endpoint: null
   })
   let [visible, setVisible] = useState(false)
   const [permission, requestPermission] = useCameraPermissions();
-
-  useEffect(() => {
-    console.log(config);
-  }, [config])
 
   let openQrScanner = () => {
     if(permission.granted){
@@ -64,12 +60,42 @@ export default function Configuration() {
 
       [Peer]
       PublicKey = ${config.public_key}
-      AllowedIPs = 0.0.0.0/0,::/0
-      PersistentKeepalive = 25
-      Endpoint = ${config.endpoint}:51820`
+      AllowedIPs = ${config.allowed}
+      Endpoint = ${config.endpoint}:51820
+      PersistentKeepalive = 25`
 
-      const profiles = JSON.stringify([{[config['name']]: template}]);
-      await AsyncStorage.setItem('profiles', profiles);
+      let profileList = await AsyncStorage.getItem('profiles')
+
+      if(profileList != null){
+        profileList = JSON.parse(profileList)
+        profileList.push({
+          name: config['name'],
+          address: config.address,
+          config: template
+        })
+        const profiles = JSON.stringify(profileList);
+        await AsyncStorage.setItem('profiles', profiles);
+      }
+      else{
+        const profiles = JSON.stringify([
+          {
+            name: config['name'],
+            address: config.address,
+            config: template
+          }
+        ]);
+        await AsyncStorage.setItem('profiles', profiles); 
+      }
+
+      setConfig({
+        name: null,
+        private_key: null,
+        address: null,
+        dns: '8.8.8.8',
+        public_key: null,
+        allowed: null,
+        endpoint: null
+      })
 
       Alert.alert('Profile added successfully 👍🏻')
       
@@ -139,7 +165,7 @@ export default function Configuration() {
             </Text>
             <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
               <TextInput 
-                secureTextEntry={visible}
+                secureTextEntry={!visible}
                 value={config.private_key}
                 className="flex-1 text-slate-900 text-base"
                 placeholder='bmXOC+pV1u3zDad9eTB+'
@@ -147,7 +173,7 @@ export default function Configuration() {
                 onChangeText={(value) => setConfig({...config, private_key: value})}
               />
               <TouchableOpacity className="ml-3" onPress={() => setVisible(!visible)}>
-                <Eye size={20} color="#64748b" />
+                { visible ? <Eye size={20} color="#64748b" /> : <EyeOff size={20} color="#64748b" /> }
               </TouchableOpacity>
               {/* <TouchableOpacity className="ml-4">
                 <RefreshCw size={20} color="#1e293b" />
@@ -161,7 +187,7 @@ export default function Configuration() {
             </Text>
             <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
               <TextInput
-                placeholder='10.0.0.2/24'
+                placeholder='10.0.0.2'
                 value={config.address}
                 className="flex-1 text-slate-900 text-base"
                 placeholderTextColor="#a9a9a9"
@@ -229,7 +255,7 @@ export default function Configuration() {
             </Text>
             <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
               <TextInput
-                placeholder='0.0.0.0:51820'
+                placeholder='0.0.0.0'
                 value={config.endpoint}
                 className="flex-1 text-slate-900 text-base"
                 placeholderTextColor="#a9a9a9"

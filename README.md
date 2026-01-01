@@ -1,6 +1,6 @@
-# WireGuardApp "Golden Path" Setup Guide
+# Anywhere: WireGuard-based React Native (Expo) Android VPN Project Setup Guide
 
-This guide provides a robust, error-proof walkthrough for setting up the WireGuardApp on a new machine. It incorporates fixes for common build errors (NDK versions, signature mismatches) encountered during development.
+This guide provides a robust, error-proof walkthrough for setting up the React Native (bare expo) andorid VPN project on a new machine. It incorporates fixes for common build errors (NDK versions, signature mismatches) encountered during development.
 
 ## 0. Prerequisites (Strict)
 Ensure these are installed and configured **before** starting:

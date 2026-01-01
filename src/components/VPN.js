@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -10,17 +10,18 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { 
-  Menu, 
+  ShieldX, 
   Server, 
   Power, 
+  PowerOff,
   ChevronRight, 
   ArrowUp, 
   ArrowDown, 
   Clock,
-  ShieldPlus 
+  ShieldPlus, 
+  ShieldCheck
 } from 'lucide-react-native';
-import { useSelector, useDispatch } from 'react-redux'
-import { add } from '../redux/variableSlice';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import WireGuardModule from '../wireguard/WireGuardModule';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -28,34 +29,114 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function VPN() {
 
   let [isConnected, setIsConnected] = useState(false)
-  const value = useSelector((state) => state.variable.value)
+  let [config, setConfig] = useState(null)
+  const lastStatsRef = useRef({ rx: 0, tx: 0, timestamp: Date.now() });
+  const timerRef = useRef(null);
+  const statsIntervalRef = useRef(null);
+  let [transfer, setTransfer] = useState({Rx: 0, Tx: 0})
+  let speedRef = useRef(null)
   const navigation = useNavigation()
-  const dispatch = useDispatch()
-  console.log('Redux value: ', value);
+
+  useEffect(() => {
+    loadConfig()
+
+    if(!isConnected) return
+
+    const startTime = Date.now();
+    timerRef.current = setInterval(() => {
+        const diff = Math.floor((Date.now() - startTime) / 1000);
+        const m = Math.floor(diff / 60).toString().padStart(2, '0');
+        const s = (diff % 60).toString().padStart(2, '0');
+        setDuration(`${m}:${s}`);
+    }, 1000);
+
+    // Poll stats
+    statsIntervalRef.current = setInterval(async () => {
+        try {
+            const currentStats = await WireGuardModule.getStatistics("demo-tunnel");
+            // getStatistics returns { totalRx: number, totalTx: number }
+
+            const now = Date.now();
+            const timeDelta = (now - lastStatsRef.current.timestamp) / 1000;
+
+            if (timeDelta > 0 && currentStats) {
+                const rxDiff = currentStats.totalRx - lastStatsRef.current.rx;
+                const txDiff = currentStats.totalTx - lastStatsRef.current.tx;
+
+                // Avoid negative spikes on restart or reset
+                const rxSpeed = rxDiff > 0 ? rxDiff / timeDelta : 0;
+                const txSpeed = txDiff > 0 ? txDiff / timeDelta : 0;
+
+                setTransfer({
+                  Rx: formatSpeed(rxSpeed),
+                  Tx: formatSpeed(txSpeed)
+                })
+                // Note: We could save the unit in state too if we want dynamic units
+
+                lastStatsRef.current = {
+                    rx: currentStats.totalRx,
+                    tx: currentStats.totalTx,
+                    timestamp: now
+                };
+            }
+        } catch (e) {
+            console.log("Stats error", e);
+        }
+    }, 1000);
+
+    return () => {
+        clearInterval(timerRef.current);
+        clearInterval(statsIntervalRef.current);
+    };
+
+  }, [isConnected])
+
+  let loadConfig = async() => {
+    let profile = await AsyncStorage.getItem('config')
+    if (profile != null){
+      setConfig(JSON.parse(profile))
+      setIsConnected(JSON.parse(profile)['connected'])
+    }
+    else{
+      console.log('No connection profile loaded');
+    }
+  }
 
   const toggleConnection = async () => {
-      try {
-          if (isConnected) {
-              await WireGuardModule.disconnect("demo-tunnel");
-              setIsConnected(false);
-          } else {
-              // Valid Mock Config
-              const mockConfig = `[Interface]
-              PrivateKey = cA7jK3rZNT9JDbo7/l5fHghWE1/ac3Cfvn7VI8cTgEY=
-              Address = 10.0.0.2/24
-
-              [Peer]
-              PublicKey = RqdFmo32waIHq/xH4Bux6XoSePJxWnuz8skYIM2+kD0=
-              AllowedIPs = 0.0.0.0/0
-              Endpoint = 192.168.52.134:51820`;
-              await WireGuardModule.connect("demo-tunnel", mockConfig);
-              setIsConnected(true);
-          }
-      } catch (e) {
-          console.error(e);
-          alert("Connection Failed: " + e.message);
+    try {
+      if(config != null && config.connected){
+        console.log('Disconnecting');
+        await WireGuardModule.disconnect(config.name);
+        let configCopy = config
+        configCopy['connected'] = false
+        await AsyncStorage.setItem('config', JSON.stringify(configCopy))
+        setIsConnected(false)
       }
+      else{
+        console.log('Connecting');
+        await WireGuardModule.connect(config.name, config.config);
+        let configCopy = config
+        configCopy['connected'] = true
+        await AsyncStorage.setItem('config', JSON.stringify(configCopy))
+        setIsConnected(true)
+      }
+    } catch (e) {
+        console.error(e);
+        alert("Connection Failed: " + e.message);
+    }
   };
+
+  // Format speed
+  const formatSpeed = (bytesPerSec) => {
+      // Convert to bits per second for Mbps display if preferred, 
+      // but user asked for "transfer rate", usually B/s or MB/s. 
+      // Logic below keeps typical "MB/s" format.
+      if (bytesPerSec === 0) return '0';
+      const k = 1024;
+      const i = Math.floor(Math.log(bytesPerSec) / Math.log(k));
+      return parseFloat((bytesPerSec / Math.pow(k, i)).toFixed(2));
+  };
+
 
   return (
     <LinearGradient
@@ -101,11 +182,11 @@ export default function VPN() {
             </View>
             
             <Text className="text-white text-5xl font-bold tracking-tight">
-              Connected
+              { config != null && config.connected == true ? 'Connected' : 'Disconnected' }
             </Text>
-            <Text className="text-zinc-400 text-lg mt-1">
+            {/* <Text className="text-zinc-400 text-lg mt-1">
               Germany - DE1
-            </Text>
+            </Text> */}
           </View>
 
           {/* Power Button */}
@@ -114,9 +195,9 @@ export default function VPN() {
               <View className="w-60 h-60 rounded-full border border-emerald-500/10 items-center justify-center">
                 <TouchableOpacity 
                   activeOpacity={0.8}
-                  className="w-44 h-44 rounded-full bg-emerald-500 items-center justify-center"
+                  className={`w-44 h-44 rounded-full ${config != null && config.connected == true ? 'bg-emerald-500' : 'bg-red-500'} items-center justify-center`}
                   style={{
-                    shadowColor: '#10b981',
+                    shadowColor: `${ config != null && config.connected ? '#10b981' : '#ef4444' }`,
                     shadowOffset: { width: 0, height: 0 },
                     shadowOpacity: 0.6,
                     shadowRadius: 30,
@@ -124,7 +205,10 @@ export default function VPN() {
                   }}
                   onPress={toggleConnection}
                 >
-                  <Power size={60} color="white" strokeWidth={2.5} />
+                  { 
+                    config != null && config.connected == true ? 
+                    <Power size={60} color="white" strokeWidth={2.5} /> : <PowerOff size={60} color="white" strokeWidth={2.5} />
+                  }
                 </TouchableOpacity>
               </View>
             </View>
@@ -132,19 +216,16 @@ export default function VPN() {
 
           {/* Current Server Card */}
           <View className="px-6 mb-6">
-            <TouchableOpacity className="bg-zinc-900/60 border border-zinc-800/80 p-5 rounded-[36px] flex-row items-center" onPress={() => navigation.navigate('Connection')}>
-              <View className="w-14 h-11 bg-zinc-800 rounded-xl overflow-hidden">
-                <View className="h-1/3 bg-black" />
-                <View className="h-1/3 bg-red-600" />
-                <View className="h-1/3 bg-yellow-400" />
-              </View>
-              
+            <TouchableOpacity className="bg-zinc-900/60 border border-zinc-800/80 p-5 rounded-[16px] flex-row items-center" onPress={() => navigation.navigate('Connection')}>
+              {
+                config != null ? <ShieldCheck size={32} color="#ffffff" /> : <ShieldX size={32} color="#ffffff" />
+              }
               <View className="flex-1 ml-4">
                 <Text className="text-zinc-500 text-[10px] font-bold tracking-widest uppercase mb-0.5">
                   Connection Profile
                 </Text>
                 <Text className="text-white text-lg font-bold">
-                  Bangalore - IND
+                  { config != null ? config.name : 'Not Found' }
                 </Text>
               </View>
 
@@ -156,23 +237,23 @@ export default function VPN() {
 
           {/* Stats Row */}
           <View className="flex-row px-5 justify-between">
-            <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[32px] p-5 items-center mx-1">
+            <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[16px] p-5 items-center mx-1">
               <View className="bg-zinc-800/50 p-2 rounded-full mb-3">
                 <ArrowUp size={18} color="#94a3b8" />
               </View>
-              <Text className="text-white text-2xl font-bold">24</Text>
+              <Text className="text-white text-2xl font-bold">{transfer.Tx}</Text>
               <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">MB/S</Text>
             </View>
 
-            <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[32px] p-5 items-center mx-1">
+            <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[16px] p-5 items-center mx-1">
               <View className="bg-zinc-800/50 p-2 rounded-full mb-3">
                 <ArrowDown size={18} color="#94a3b8" />
               </View>
-              <Text className="text-white text-2xl font-bold">102</Text>
+              <Text className="text-white text-2xl font-bold">{transfer.Rx}</Text>
               <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">MB/S</Text>
             </View>
 
-            <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[32px] p-5 items-center mx-1">
+            <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[16px] p-5 items-center mx-1">
               <View className="bg-zinc-800/50 p-2 rounded-full mb-3">
                 <Clock size={18} color="#94a3b8" />
               </View>

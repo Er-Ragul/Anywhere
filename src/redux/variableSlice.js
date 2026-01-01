@@ -1,18 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-    value: "0"
+    vpn: null
 }
 
 export const variableSlice = createSlice({
     name: 'variable',
     initialState,
     reducers: {
-        add: (state, action) => {
-            state.value = action.payload
+        loadConfig: (state, action) => {
+            state.vpn = action.payload
         }
     }
 })
 
-export const { add } = variableSlice.actions
+export const { loadConfig } = variableSlice.actions
 export default variableSlice.reducer
