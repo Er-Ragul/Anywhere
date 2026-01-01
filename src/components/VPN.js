@@ -33,7 +33,8 @@ export default function VPN() {
   const lastStatsRef = useRef({ rx: 0, tx: 0, timestamp: Date.now() });
   const timerRef = useRef(null);
   const statsIntervalRef = useRef(null);
-  let [transfer, setTransfer] = useState({Rx: 0, Tx: 0})
+  let [transfer, setTransfer] = useState({Rx: [0, 'B'], Tx: [0, 'B']})
+  let [duration, setDuration] = useState('0')
   let speedRef = useRef(null)
   const navigation = useNavigation()
 
@@ -42,18 +43,34 @@ export default function VPN() {
 
     if(!isConnected) return
 
-    const startTime = Date.now();
-    timerRef.current = setInterval(() => {
-        const diff = Math.floor((Date.now() - startTime) / 1000);
-        const m = Math.floor(diff / 60).toString().padStart(2, '0');
-        const s = (diff % 60).toString().padStart(2, '0');
-        setDuration(`${m}:${s}`);
-    }, 1000);
+    const setTime = async() => {
+      let time = await AsyncStorage.getItem("startTime");
+      if(time !== null){
+        timerRef.current = setInterval(() => {
+          const diff = Math.floor((Date.now() - Number(time)) / 1000);
+          const m = Math.floor(diff / 60).toString().padStart(2, '0');
+          const s = (diff % 60).toString().padStart(2, '0');
+          setDuration(`${m}:${s}`);
+        }, 1000);
+      } 
+      else{
+        const now = Date.now();
+        await AsyncStorage.setItem("startTime", now.toString());
+        timerRef.current = setInterval(() => {
+          const diff = Math.floor((Date.now() - now) / 1000);
+          const m = Math.floor(diff / 60).toString().padStart(2, '0');
+          const s = (diff % 60).toString().padStart(2, '0');
+          setDuration(`${m}:${s}`);
+        }, 1000);
+      }
+    }
+
+    setTime()
 
     // Poll stats
     statsIntervalRef.current = setInterval(async () => {
         try {
-            const currentStats = await WireGuardModule.getStatistics("demo-tunnel");
+            const currentStats = await WireGuardModule.getStatistics(config.name);
             // getStatistics returns { totalRx: number, totalTx: number }
 
             const now = Date.now();
@@ -68,8 +85,8 @@ export default function VPN() {
                 const txSpeed = txDiff > 0 ? txDiff / timeDelta : 0;
 
                 setTransfer({
-                  Rx: formatSpeed(rxSpeed),
-                  Tx: formatSpeed(txSpeed)
+                  Rx: [formatSpeed(rxSpeed), getSpeedUnit(rxSpeed)],
+                  Tx: [formatSpeed(txSpeed), getSpeedUnit(rxSpeed)]
                 })
                 // Note: We could save the unit in state too if we want dynamic units
 
@@ -102,6 +119,24 @@ export default function VPN() {
     }
   }
 
+  // Formatted speed
+  const formatSpeed = (bytesPerSec) => {
+      // Logic below keeps typical "MB/s" format.
+      if (bytesPerSec === 0) return '0';
+      const k = 1024;
+      const i = Math.floor(Math.log(bytesPerSec) / Math.log(k));
+      return parseFloat((bytesPerSec / Math.pow(k, i)).toFixed(2));
+  };
+
+  // Fromatted Unit
+  const getSpeedUnit = (bytesPerSec) => {
+    if (bytesPerSec === 0) return 'KB/s';
+    const k = 1024;
+    const sizes = ['B/s', 'KB/s', 'MB/s', 'GB/s', 'TB/s'];
+    const i = Math.floor(Math.log(bytesPerSec) / Math.log(k));
+    return sizes[i];
+  };
+
   const toggleConnection = async () => {
     try {
       if(config != null && config.connected){
@@ -110,6 +145,7 @@ export default function VPN() {
         let configCopy = config
         configCopy['connected'] = false
         await AsyncStorage.setItem('config', JSON.stringify(configCopy))
+        await AsyncStorage.removeItem('startTime')
         setIsConnected(false)
       }
       else{
@@ -125,18 +161,6 @@ export default function VPN() {
         alert("Connection Failed: " + e.message);
     }
   };
-
-  // Format speed
-  const formatSpeed = (bytesPerSec) => {
-      // Convert to bits per second for Mbps display if preferred, 
-      // but user asked for "transfer rate", usually B/s or MB/s. 
-      // Logic below keeps typical "MB/s" format.
-      if (bytesPerSec === 0) return '0';
-      const k = 1024;
-      const i = Math.floor(Math.log(bytesPerSec) / Math.log(k));
-      return parseFloat((bytesPerSec / Math.pow(k, i)).toFixed(2));
-  };
-
 
   return (
     <LinearGradient
@@ -241,23 +265,23 @@ export default function VPN() {
               <View className="bg-zinc-800/50 p-2 rounded-full mb-3">
                 <ArrowUp size={18} color="#94a3b8" />
               </View>
-              <Text className="text-white text-2xl font-bold">{transfer.Tx}</Text>
-              <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">MB/S</Text>
+              <Text className="text-white text-2xl font-bold">{transfer.Tx[0]}</Text>
+              <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">{transfer.Tx[1]}</Text>
             </View>
 
             <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[16px] p-5 items-center mx-1">
               <View className="bg-zinc-800/50 p-2 rounded-full mb-3">
                 <ArrowDown size={18} color="#94a3b8" />
               </View>
-              <Text className="text-white text-2xl font-bold">{transfer.Rx}</Text>
-              <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">MB/S</Text>
+              <Text className="text-white text-2xl font-bold">{transfer.Rx[0]}</Text>
+              <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">{transfer.Rx[1]}</Text>
             </View>
 
             <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[16px] p-5 items-center mx-1">
               <View className="bg-zinc-800/50 p-2 rounded-full mb-3">
                 <Clock size={18} color="#94a3b8" />
               </View>
-              <Text className="text-white text-2xl font-bold">42:15</Text>
+              <Text className="text-white text-2xl font-bold">{duration}</Text>
               <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">Time</Text>
             </View>
           </View>
