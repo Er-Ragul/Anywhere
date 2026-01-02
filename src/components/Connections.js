@@ -115,13 +115,13 @@ export default function Connections() {
       >
         {/* Header */}
         <View className="flex-row justify-between items-center px-6 py-4">
-          <TouchableOpacity className="w-10 h-10 bg-zinc-800 rounded-full items-center justify-center" onPress={() => navigation.navigate('VPN')}>
+          <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={() => navigation.navigate('VPN')}>
             <ArrowLeft size={24} color="white" />
           </TouchableOpacity>
           <Text className="text-white text-2xl font-bold tracking-tight">
             Anywhere
           </Text>
-          <TouchableOpacity className="w-10 h-10 bg-zinc-800 rounded-full items-center justify-center" onPress={savedProfiles}>
+          <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={savedProfiles}>
             <RefreshCcw size={24} color="white" />
           </TouchableOpacity>
         </View>

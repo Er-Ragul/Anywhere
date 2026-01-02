@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -9,11 +9,12 @@ import {
   KeyboardAvoidingView, 
   Platform, 
   StatusBar,
-  Dimensions
+  Dimensions,
+  Alert
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { 
-  FileUp,
+  Eye,
   Shield, 
   Server, 
   Lock, 
@@ -21,11 +22,57 @@ import {
   ArrowRight 
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function Authentication(){
 
   const navigation = useNavigation()
+  let [fqdn, setFqdn] = useState(null)
+  let [password, setPassword] = useState(null)
   const [passwordVisible, setPasswordVisible] = useState(false);
+
+  useEffect(() => {
+    checkForHub()
+  }, [])
+
+
+  let checkForHub = async() => {
+    let hub = await AsyncStorage.getItem('anywhere-hub')
+
+    if(hub != null){
+      navigation.navigate('Profile')
+    }
+  }
+
+  let register = async() => {
+    if(fqdn != null){
+      if(password != null){
+        try{
+          let response = await axios.post(`http://${fqdn}/webhook/register`, {endpoint: fqdn, password: password})
+          
+          if(response.data.status == 'success'){
+            await AsyncStorage.setItem('anywhere-hub', JSON.stringify({
+              endpoint: fqdn,
+              token: response.data.result.token,
+              id: response.data.result.id
+            }))
+            navigation.navigate('Profile')
+          }
+        }
+        catch(err){
+          console.log(err);
+        }
+      }
+      else{
+        Alert.alert('Password field should not be empty')
+      }
+    }
+    else{
+      Alert.alert('Server field should not be empty')
+    }
+  }
 
   return (
     <View className="flex-1 bg-[#0a0a0b]">
@@ -93,12 +140,13 @@ export default function Authentication(){
                   <View className="flex-row items-center bg-[#131418] border border-zinc-800/60 rounded-2xl px-5">
                     <Server size={20} color="#52525b" />
                     <TextInput
+                      value={fqdn}
                       placeholder="Ex: vpn.anywhere.in"
                       placeholderTextColor="#3f3f46"
                       className="flex-1 text-white h-16 ml-3 text-base"
                       autoCapitalize="none"
-                      // Avoids the view jumping on Android
                       underlineColorAndroid="transparent"
+                      onChangeText={(value) => setFqdn(value)}
                     />
                   </View>
                 </View>
@@ -111,14 +159,16 @@ export default function Authentication(){
                   <View className="flex-row items-center bg-[#131418] border border-zinc-800/60 rounded-2xl px-5">
                     <Lock size={20} color="#52525b" />
                     <TextInput
+                      value={password}
                       placeholder="Enter password"
                       placeholderTextColor="#3f3f46"
                       secureTextEntry={!passwordVisible}
                       className="flex-1 text-white h-16 ml-3 text-base"
                       underlineColorAndroid="transparent"
+                      onChangeText={(value) => setPassword(value)}
                     />
                     <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-                      <EyeOff size={20} color="#52525b" />
+                      { passwordVisible ? <Eye size={20} color="#52525b" /> : <EyeOff size={20} color="#52525b" /> }
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -131,7 +181,7 @@ export default function Authentication(){
                 <TouchableOpacity 
                   activeOpacity={0.9}
                   className="bg-white h-[56px] rounded-[24px] flex-row items-center justify-center mt-4 shadow-lg shadow-white/10"
-                  onPress={() => navigation.navigate('Profile')}
+                  onPress={register}
                 >
                   <Text className="text-black text-xl font-black mr-2">Register</Text>
                   <ArrowRight size={22} color="black" strokeWidth={3} />

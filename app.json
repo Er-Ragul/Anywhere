@@ -21,7 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.Anywhere"
+      "package": "com.raguls.Anywhere"
     },
     "web": {
       "bundler": "metro",

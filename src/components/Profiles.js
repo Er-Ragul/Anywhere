@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { 
   View, 
   Text, 
@@ -9,35 +9,244 @@ import {
   ScrollView, 
   Platform, 
   StatusBar,
-  Modal
+  Modal,
+  Alert
 } from 'react-native';
 import { 
-  ArrowLeft, 
+  GlobeLock, 
   Plus,  
   Router,
   QrCode,
   Trash2,
   Server, 
-  LayersPlus
+  LayersPlus,
+  Power,
+  PowerOff
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export default function Profiles() {
 
   let navigation = useNavigation()
-  let [profiles, setProfiles] = useState([])
+  let serverRef = useRef(null)
+  let nameRef = useRef(null)
+  let [running, setRunning] = useState(false)
+  let [clients, setClients] = useState([])
   let [power, setPower] = useState(false)
   let [modal, setModal] = useState(false)
 
   useEffect(() => {
-    savedProfiles()
+    retriveCreds()
   }, [])
 
-  const savedProfiles = async() => {
-    let saved = await AsyncStorage.getItem('profiles');
-    setProfiles(JSON.parse(saved))
+  let retriveCreds = async() => {
+    let anywhere = await AsyncStorage.getItem('anywhere-hub')
+    serverRef.current = {
+      endpoint: JSON.parse(anywhere)['endpoint'],
+      token: JSON.parse(anywhere)['token']
+    }
+
+    serverStatus()
+    getClients()
+  }
+
+  const serverStatus = async() => {
+    try{
+      let result = await axios.get(`http://${serverRef.current.endpoint}/webhook/status`,{
+        headers: {
+          'Authorization': `Bearer ${serverRef.current.token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if(result.data.status == 'success'){
+        setRunning(true)
+        getClients()
+      }
+      else if(result.data.status == 'failed'){
+        setRunning(false)
+        getClients()
+      }
+      else{
+        Alert.alert('Something went wrong')
+      }
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+
+  let getClients = async() => {
+    try {
+      let result = await axios.get(`http://${serverRef.current.endpoint}/webhook/peers`,{
+        headers: {
+          'Authorization': `Bearer ${serverRef.current.token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if(result.data.status == 'success'){
+        console.log(result.data);
+        setClients(result.data.peers)
+      }
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+
+  let makeTheServer = async() => {
+    if(running){
+      try {
+        let result = await axios.get(`http://${serverRef.current.endpoint}/webhook/stop`,{
+          headers: {
+            'Authorization': `Bearer ${serverRef.current.token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if(result.data.status == 'success'){
+          setRunning(false)
+          getClients()
+        }
+      }
+      catch(err){
+        console.log(err);
+      }
+    }
+    else{
+      try {
+        let result = await axios.get(`http://${serverRef.current.endpoint}/webhook/start`,{
+          headers: {
+            'Authorization': `Bearer ${serverRef.current.token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if(result.data.status == 'success'){
+          setRunning(true)
+          getClients()
+        }
+      }
+      catch(err){
+        console.log(err);
+      }
+    }
+  }
+
+  let addClient = async() => {
+    console.log(nameRef.current)
+    if(nameRef.current != null){
+      try {
+        let result = await axios.post(`http://${serverRef.current.endpoint}/webhook/add`, {name: nameRef.current}, {
+          headers: {
+            'Authorization': `Bearer ${serverRef.current.token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if(result.data.status == 'success'){
+          setModal(!modal)
+          nameRef.current = null
+          getClients()
+        }
+        else if(result.data.status == 'failed'){
+          Alert.alert(result.data.result)
+          setModal(!modal)
+          nameRef.current = null
+        }
+        else{
+          Alert.alert('Something went wrong')
+        }
+      }
+      catch(err){
+        console.log(err);
+      }
+    }
+    else{
+      Alert.alert('Client name should not be empty')
+    }
+  }
+
+  let removeClient = async(client) => {
+    let info = {
+      id: client._id,
+      ip: client.ip,
+      name: client.name,
+      public_key: client.public_key
+    }
+
+    try {
+      let result = await axios.post(`http://${serverRef.current.endpoint}/webhook/remove`, info, {
+        headers: {
+          'Authorization': `Bearer ${serverRef.current.token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if(result.data.status == 'success'){
+        getClients()
+      }
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+
+  let makeTheConnection = async(client) => {
+    if(!client.connection){
+      console.log('Requesting to make active');
+      let info = {
+        id: client._id,
+        ip: client.ip,
+        public_key: client.public_key,
+        connection: true
+      }
+
+      try {
+        let result = await axios.post(`http://${serverRef.current.endpoint}/webhook/unblock`, info, {
+          headers: {
+            'Authorization': `Bearer ${serverRef.current.token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if(result.data.status == 'success'){
+          getClients()
+        }
+      }
+      catch(err){
+        console.log(err);
+      }
+    }
+    else{
+      console.log('Requesting to make inactive');
+      let info = {
+        id: client._id,
+        ip: client.ip,
+        public_key: client.public_key,
+        connection: false
+      }
+
+      try {
+        let result = await axios.post(`http://${serverRef.current.endpoint}/webhook/block`, info, {
+          headers: {
+            'Authorization': `Bearer ${serverRef.current.token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if(result.data.status == 'success'){
+          getClients()
+        }
+      }
+      catch(err){
+        console.log(err);
+      }
+    }
   }
 
   let ModalViewer = () => {
@@ -99,12 +308,12 @@ export default function Profiles() {
                     <View className="flex-row items-center bg-[#131418] border border-zinc-800/60 rounded-2xl px-5">
                         <Server size={20} color="#52525b" />
                         <TextInput
-                        placeholder="Ex: Delhi"
-                        placeholderTextColor="#3f3f46"
-                        className="flex-1 text-white h-16 ml-3 text-base"
-                        autoCapitalize="none"
-                        // Avoids the view jumping on Android
-                        underlineColorAndroid="transparent"
+                          placeholder="Ex: Delhi"
+                          placeholderTextColor="#3f3f46"
+                          className="flex-1 text-white h-16 ml-3 text-base"
+                          autoCapitalize="none"
+                          underlineColorAndroid="transparent"
+                          onChangeText={(value) => nameRef.current = value}
                         />
                     </View>
                     </View>
@@ -113,7 +322,7 @@ export default function Profiles() {
                     <TouchableOpacity 
                     activeOpacity={0.9}
                     className="bg-white h-[56px] rounded-[24px] flex-row items-center justify-center mt-4 shadow-lg shadow-white/10"
-                    onPress={() => setModal(!modal)}
+                    onPress={addClient}
                     >
                     <Text className="text-black text-xl font-black mr-2">Add</Text>
                     <LayersPlus size={22} color="black" strokeWidth={3} />
@@ -139,16 +348,24 @@ export default function Profiles() {
         {/* Header */}
         <View className="flex-row justify-between items-center px-6 py-4">
           <View className="flex-row gap-x-3">
-            {/* <TouchableOpacity className="w-10 h-10 bg-zinc-800 rounded-full items-center justify-center">
-              <Contrast size={20} color="white" />
-            </TouchableOpacity> */}
-            <TouchableOpacity className="w-10 h-10 rounded-full items-center justify-center" onPress={() => navigation.goBack()}>
-              <ArrowLeft size={24} color="white" />
+            <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={() => navigation.navigate('VPN')}>
+              <GlobeLock size={24} color="white" />
             </TouchableOpacity>
           </View>
           <Text className="text-white text-2xl font-bold tracking-tight">
             Anywhere Hub
           </Text>
+          <View className="flex-row gap-x-3">
+            {
+              running ?
+              <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={makeTheServer}>
+                <Power size={24} color="green" />
+              </TouchableOpacity>:
+              <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={makeTheServer}>
+                <PowerOff size={24} color="red" />
+              </TouchableOpacity>
+            }
+          </View>
         </View>
 
         <ScrollView 
@@ -161,31 +378,34 @@ export default function Profiles() {
           <View className="flex-row items-center justify-between mt-10 mb-6">
             <Text className="text-white text-xl font-bold">Clients</Text>
             <View className="bg-zinc-800 w-6 h-6 rounded-md items-center justify-center">
-              <Text className="text-zinc-400 text-xs font-bold">4</Text>
+              <Text className="text-zinc-400 text-xs font-bold">{clients.length}</Text>
             </View>
           </View>
 
           {/* Configuration List */}
           <View className="gap-y-4">
-            {/* Item 1 */}
-            <View className="bg-zinc-900 border border-zinc-800 p-5 rounded-[10px] flex-row items-center">
-              <View className="w-12 h-12 bg-zinc-800 rounded-2xl items-center justify-center">
-                <Router size={22} color="white" />
-              </View>
-              <View className="flex-1 ml-4">
-                <Text className="text-white font-bold my-1">Gaming Private Net</Text>
-                <Text className="text-zinc-500 text-xs font-mono my-1">192.168.50.1</Text>
-              </View>
-              <TouchableOpacity className="mx-2">
-                <Trash2 size={22} color="white" />
-              </TouchableOpacity>
-              <TouchableOpacity className="mx-2">
-                <QrCode size={22} color="white" />
-              </TouchableOpacity>
-              <TouchableOpacity className={`ml-2 w-12 h-7 bg-black rounded-full px-1 justify-center ${power ? 'items-end' : 'items-start'} border border-zinc-800`} onPress={() => setPower(!power)}>
-                <View className="w-5 h-5 bg-white rounded-full" />
-              </TouchableOpacity>
-            </View>
+            {
+              clients.length > 0 ? clients.map((client) => (
+                <View className="bg-zinc-900 border border-zinc-800 p-5 rounded-[10px] flex-row items-center" key={client._id}>
+                  <View className="w-12 h-12 bg-zinc-800 rounded-2xl items-center justify-center">
+                    <Router size={22} color="white" />
+                  </View>
+                  <View className="flex-1 ml-4">
+                    <Text className="text-white font-bold my-1">{client.name}</Text>
+                    <Text className="text-zinc-500 text-xs font-mono my-1">10.0.0.{client.ip}</Text>
+                  </View>
+                  <TouchableOpacity className="mx-2" onPress={() => removeClient(client)}>
+                    <Trash2 size={22} color="white" />
+                  </TouchableOpacity>
+                  <TouchableOpacity className="mx-2">
+                    <QrCode size={22} color="white" />
+                  </TouchableOpacity>
+                  <TouchableOpacity className={`ml-2 w-12 h-7 bg-black rounded-full px-1 justify-center ${client.connection ? 'items-end' : 'items-start'} border border-zinc-800`} onPress={() => makeTheConnection(client)}>
+                    <View className="w-5 h-5 bg-white rounded-full" />
+                  </TouchableOpacity>
+                </View>
+              )):null
+            }
           </View>
         </ScrollView>
 

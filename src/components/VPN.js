@@ -177,7 +177,7 @@ export default function VPN() {
       >
         {/* Header */}
         <View className="flex-row justify-between items-center px-6 py-4">
-          <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-2xl items-center justify-center border border-zinc-700/50"
+          <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50"
           onPress={() => navigation.navigate('Configuration')}>
             <ShieldPlus size={24} color="#ffffff" />
           </TouchableOpacity>
@@ -186,7 +186,7 @@ export default function VPN() {
             Anywhere
           </Text>
 
-          <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-2xl items-center justify-center border border-zinc-700/50" onPress={() => navigation.navigate('Authentication')}>
+          <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={() => navigation.navigate('Authentication')}>
             <Server size={24} color="#ffffff" />
           </TouchableOpacity>
         </View>
