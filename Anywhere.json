@@ -1,0 +1,1851 @@
+{
+  "name": "Anywhere",
+  "nodes": [
+    {
+      "parameters": {
+        "command": "wg-quick up wg0"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        512,
+        -112
+      ],
+      "id": "67d0550d-dd51-48dc-b78e-e6f60fb9434f",
+      "name": "wg-up",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": {{ JSON.stringify($json.stderr) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        704,
+        -112
+      ],
+      "id": "d006436a-e496-4541-8036-4a2ed4d5d1b5",
+      "name": "start-success"
+    },
+    {
+      "parameters": {
+        "command": "wg-quick down wg0"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        80,
+        432
+      ],
+      "id": "f5e41655-852d-4a7c-a7ae-8773a3b893b3",
+      "name": "wg-down",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": {{ JSON.stringify($json.stderr) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        304,
+        432
+      ],
+      "id": "c7406007-3427-43f9-84e4-41159d5fab40",
+      "name": "stop-success"
+    },
+    {
+      "parameters": {
+        "command": "wg"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        80,
+        752
+      ],
+      "id": "357d2870-5163-443d-8440-cdad7ecc75a6",
+      "name": "wg-list",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6c09a33f-80a9-4bfa-9c74-9f91d3ff765c",
+              "leftValue": "={{ $json.stdout }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        288,
+        752
+      ],
+      "id": "c7175c4e-cdab-493a-8752-6931582cba15",
+      "name": "status-if"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": {{ JSON.stringify($json.stdout) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        528,
+        656
+      ],
+      "id": "14a1aa89-690d-4776-88cb-cf038a975d82",
+      "name": "status-success"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"failed\",\n  \"result\": \"No records found\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        528,
+        848
+      ],
+      "id": "bf943514-8d18-4107-915b-65f526893fa2",
+      "name": "status-failed"
+    },
+    {
+      "parameters": {
+        "path": "start",
+        "authentication": "jwtAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -128,
+        16
+      ],
+      "id": "713f75ae-a49a-4ea7-a520-1f9e79a889f7",
+      "name": "start",
+      "webhookId": "64ac9f29-a470-4567-8808-b0ac1aa03188",
+      "credentials": {
+        "jwtAuth": {
+          "id": "rg81tMyTpOOkRR7E",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "status",
+        "authentication": "jwtAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -128,
+        752
+      ],
+      "id": "8a9c4ed0-cb7e-4ecd-9c1f-2a0fbf69b8b7",
+      "name": "status",
+      "webhookId": "64ac9f29-a470-4567-8808-b0ac1aa03188",
+      "credentials": {
+        "jwtAuth": {
+          "id": "rg81tMyTpOOkRR7E",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "add",
+        "authentication": "jwtAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -128,
+        1184
+      ],
+      "id": "b64421f0-56b9-4ea0-8e54-c5758eb27081",
+      "name": "add",
+      "webhookId": "64ac9f29-a470-4567-8808-b0ac1aa03188",
+      "credentials": {
+        "jwtAuth": {
+          "id": "rg81tMyTpOOkRR7E",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=address=10.0.0.{{ $json.ip }} /root/add-peer.sh"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        944,
+        1088
+      ],
+      "id": "39013300-93bc-4c9c-a9ef-9bb428f9b721",
+      "name": "wg-add",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "stop",
+        "authentication": "jwtAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -128,
+        432
+      ],
+      "id": "c56bf681-0933-4687-b01f-446d69b83455",
+      "name": "stop",
+      "webhookId": "64ac9f29-a470-4567-8808-b0ac1aa03188",
+      "credentials": {
+        "jwtAuth": {
+          "id": "rg81tMyTpOOkRR7E",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": {\n      \"name\": \"{{ $json.peer.name }}\",\n      \"private_key\": \"{{ $json.peer.private_key }}\",\n      \"public_key\": \"{{ $json.peer.public_key }}\",\n      \"ip\": \"{{ $json.peer.ip }}\",\n      \"id\": \"{{ $json._id }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1968,
+        1088
+      ],
+      "id": "1522356c-d5f9-4556-bf17-b0099b6a3cab",
+      "name": "add-success"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "remove",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        1552
+      ],
+      "id": "192b2478-08ec-484b-aedd-f76d0e5dfd64",
+      "name": "remove",
+      "webhookId": "64ac9f29-a470-4567-8808-b0ac1aa03188"
+    },
+    {
+      "parameters": {
+        "command": "=Public_key={{ $json.body.public_key }} /root/remove-peer.sh"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        96,
+        1552
+      ],
+      "id": "7d9a5f23-845f-4d51-8112-84df4ad291f3",
+      "name": "wg-remove",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": \"Peer removed successfully\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1152,
+        1552
+      ],
+      "id": "27b1c79d-38a5-444c-a3a4-a2492567e487",
+      "name": "remove-success"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "block",
+        "authentication": "jwtAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        1824
+      ],
+      "id": "fe5306f7-8a5b-4f84-8e3d-077d40e16046",
+      "name": "block",
+      "webhookId": "64ac9f29-a470-4567-8808-b0ac1aa03188",
+      "credentials": {
+        "jwtAuth": {
+          "id": "rg81tMyTpOOkRR7E",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=Public_key={{ $json.body.public_key }} /root/block-ip.sh"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        96,
+        1824
+      ],
+      "id": "8d226216-a8a8-4677-b367-2872d076f22e",
+      "name": "wg-block",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": \"connectin blocked\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        752,
+        1824
+      ],
+      "id": "0d334f1e-2f13-49b5-bb2b-dde61660236d",
+      "name": "block-success"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "unblock",
+        "authentication": "jwtAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        2064
+      ],
+      "id": "cf1075de-f045-40f4-aeca-21f3a0dc2d6e",
+      "name": "unblock",
+      "webhookId": "64ac9f29-a470-4567-8808-b0ac1aa03188",
+      "credentials": {
+        "jwtAuth": {
+          "id": "rg81tMyTpOOkRR7E",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=Public_key={{ $json.body.public_key }} address=10.0.0.{{ $json.body.ip }} /root/unblock-ip.sh"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        96,
+        2064
+      ],
+      "id": "e8379bb9-8f77-44f0-9dec-fee8ffb0bfbb",
+      "name": "wg-unblock",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "register",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -128,
+        -368
+      ],
+      "id": "4f1d1d3e-18e4-406a-8566-1d0c3397a298",
+      "name": "register",
+      "webhookId": "2d61d479-e6ad-4693-955d-7c26d0faff2b"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": {\n    \"id\": \"{{ $json._id }}\",\n    \"token\": \"{{ $('encrypt').item.json.token }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1328,
+        -368
+      ],
+      "id": "12ea3f73-dab2-4b52-9179-5a52dc3e4d15",
+      "name": "register-success"
+    },
+    {
+      "parameters": {
+        "useJson": true,
+        "claimsJson": "={\n  \"password\": \"{{ $json.body.password }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.jwt",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -368
+      ],
+      "id": "cd3d600d-a870-4b0a-9b1b-f3e11958871a",
+      "name": "encrypt",
+      "credentials": {
+        "jwtAuth": {
+          "id": "rg81tMyTpOOkRR7E",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "846bdcca-2fb9-4691-bbbe-0a298da5b248",
+              "name": "password",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        304,
+        -368
+      ],
+      "id": "02949a87-a8f4-43f2-9c64-abfcd62fc526",
+      "name": "format"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "passwords",
+        "fields": "password",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        -368
+      ],
+      "id": "51d5ac07-c348-467f-a29f-0f9dabb0c72b",
+      "name": "create",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "ipstore",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        528,
+        1088
+      ],
+      "id": "2eefc333-d41b-4a9d-b27f-c5b393565248",
+      "name": "ip-lookup",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "interface",
+        "fields": "interface",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        1136,
+        -368
+      ],
+      "id": "12291ee0-2442-465a-99b7-10d9ce13c679",
+      "name": "store",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c90abb89-91c5-4892-8cd9-73ed795ef886",
+              "leftValue": "={{ $json.ip }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        16
+      ],
+      "id": "df9697d0-6310-439e-b931-03d9f4c23312",
+      "name": "start-if"
+    },
+    {
+      "parameters": {
+        "collection": "ipstore",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        16
+      ],
+      "id": "87d0959a-0f30-4617-94f5-b6f857bafca3",
+      "name": "store-lookup",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"ip\": {{ Array.from({ length: 253 }, (_, i) => 2 + i) }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        112
+      ],
+      "id": "2eecd263-668d-4e21-8198-ab8c28b540e4",
+      "name": "create-ip"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "ipstore",
+        "fields": "ip",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        704,
+        112
+      ],
+      "id": "662492ad-5a6e-4253-836d-20679e3d4d19",
+      "name": "ip-store",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "wg-quick up wg0"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        896,
+        112
+      ],
+      "id": "d4274ed7-b7ab-4db3-8a49-04022b71be8c",
+      "name": "wg-1-up",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": {{ JSON.stringify($json.stderr) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1072,
+        112
+      ],
+      "id": "3b0a8e2d-d4cd-4d4d-be38-02a675ff3c87",
+      "name": "start-1-success"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"ip\": {{ $json.ip[0] }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        736,
+        1088
+      ],
+      "id": "d82a54ec-a5c2-4019-bec2-2dbeecd1139f",
+      "name": "ip-slice"
+    },
+    {
+      "parameters": {
+        "jsCode": "let array = $('ip-lookup').first().json.ip\narray.shift()\n\nreturn {\n  _id: $('ip-lookup').first().json._id,\n  ip: array\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        1088
+      ],
+      "id": "4ae9aa7d-464d-4045-89ca-b2388a0c27b3",
+      "name": "ip-shift"
+    },
+    {
+      "parameters": {
+        "operation": "findOneAndUpdate",
+        "collection": "ipstore",
+        "updateKey": "_id",
+        "fields": "ip",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        1360,
+        1088
+      ],
+      "id": "155087ef-3f64-469e-bf5e-ea627a092f73",
+      "name": "ip-update",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "wg"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        80,
+        1184
+      ],
+      "id": "9c85718d-5503-4e1c-9c50-bc476d1df015",
+      "name": "wg-1-list",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"failed\",\n  \"result\": \"WireGuard interface is not active.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        528,
+        1280
+      ],
+      "id": "a5aa9980-8b22-4600-9f74-ef9cd037e8df",
+      "name": "add-failed"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6c09a33f-80a9-4bfa-9c74-9f91d3ff765c",
+              "leftValue": "={{ $json.stdout }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        288,
+        1184
+      ],
+      "id": "a28d1338-2330-4978-8335-ab8849bc9e0c",
+      "name": "status-1-if"
+    },
+    {
+      "parameters": {
+        "jsCode": "let peer = {\n  name: $('add').first().json.body.name,\n  private_key: JSON.parse($('wg-add').first().json.stdout)['private_key'],\n  public_key: JSON.parse($('wg-add').first().json.stdout)['public_key'],\n  ip: $('ip-slice').first().json.ip,\n  connection: true\n}\n\nreturn peer"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        1088
+      ],
+      "id": "a520dbd3-7874-4599-b298-0b0120e19f5c",
+      "name": "generate-peer"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "peers",
+        "fields": "name,private_key,public_key,ip,connection",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        1776,
+        1088
+      ],
+      "id": "9ecf03a2-4c59-4115-b024-cd51dc3eb889",
+      "name": "save-peer",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "collection": "peers",
+        "query": "={ \n  \"$expr\": { \n    \"$eq\": [\n      \"$_id\", \n      { \"$toObjectId\": \"{{ $('remove').item.json.body.id }}\" }\n    ] \n  }\n}"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        1552
+      ],
+      "id": "dcd16982-3d5d-4dda-b84f-7cef8d1b99b4",
+      "name": "delete-peer",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "ipstore",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        528,
+        1552
+      ],
+      "id": "ee206157-4251-42b3-902d-d8d8c4936587",
+      "name": "list-ip",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let array = $input.first().json.ip\narray.unshift($('remove').first().json.body.ip)\n\nreturn {\n  _id: $input.first().json._id,\n  ip: array\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        1552
+      ],
+      "id": "a02a9195-463f-46d3-a474-7a34a8b1faa9",
+      "name": "unshift-ip"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "ipstore",
+        "updateKey": "_id",
+        "fields": "ip",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        944,
+        1552
+      ],
+      "id": "d99d1d3b-e07d-4bab-8548-126808f2d764",
+      "name": "update-ip",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "/root/create-interface.sh"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -368
+      ],
+      "id": "fe825c4a-9abf-470e-89fd-fc14379a9f59",
+      "name": "create-interface",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "peers",
+        "authentication": "jwtAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        2384
+      ],
+      "id": "3f8b5755-669b-47ca-9f95-2e5e59b5083d",
+      "name": "peers",
+      "webhookId": "5556a7ad-e3c4-49d5-85fb-3ecba05daa84",
+      "credentials": {
+        "jwtAuth": {
+          "id": "rg81tMyTpOOkRR7E",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "peers",
+        "options": {},
+        "query": "={}"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        2384
+      ],
+      "id": "06536935-7e7a-4a75-81d3-370f910990a0",
+      "name": "read-peers",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "qr",
+        "authentication": "jwtAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -128,
+        2672
+      ],
+      "id": "2058e980-678f-47a8-8a42-1da8474d661e",
+      "name": "qr",
+      "webhookId": "07204de2-0f55-47de-bb76-6141eafdfb10",
+      "credentials": {
+        "jwtAuth": {
+          "id": "rg81tMyTpOOkRR7E",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        480,
+        2672
+      ],
+      "id": "5e512669-8e67-4009-baa5-4a38fceb9648",
+      "name": "qr-success"
+    },
+    {
+      "parameters": {
+        "command": "=ip={{ $('qr').item.json.body.ip }} private_key={{ $('qr').item.json.body.private_key }} public_key={{ $json.interface.public_key }} /root/generate-qr.sh"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        272,
+        2672
+      ],
+      "id": "4d931092-fb57-4977-8d89-2f0a603d24cf",
+      "name": "generate-qr",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "interface",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        64,
+        2672
+      ],
+      "id": "797733a7-5200-4add-96d0-846856bf4ff2",
+      "name": "read-interface",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let keys = JSON.parse($input.first().json.stdout)\n\nlet interface = {\n  interface: $('register').first().json.body.interface,\n  endpoint: $('register').first().json.body.endpoint,\n  private_key: keys['private_key'],\n  public_key: keys['public_key']\n}\n\nreturn {\n  interface: interface\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        -368
+      ],
+      "id": "e99d3311-9def-4607-81b2-a923d89fd546",
+      "name": "frame-interface"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  _id: $('block').first().json.body.id,\n  connection: $('block').first().json.body.connection\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        1824
+      ],
+      "id": "7c1a0af5-93d6-4081-b957-8515a848d97d",
+      "name": "frame-1-update"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "peers",
+        "updateKey": "_id",
+        "fields": "connection",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        528,
+        1824
+      ],
+      "id": "88a68a18-4b8a-4111-b1e5-7711db9b7475",
+      "name": "update-1-connection",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  _id: $('unblock').first().json.body.id,\n  connection: $('unblock').first().json.body.connection\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        2064
+      ],
+      "id": "f9af986e-a7c0-4a4b-9815-92618f0e380d",
+      "name": "frame-2-update"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "peers",
+        "updateKey": "_id",
+        "fields": "connection",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        528,
+        2064
+      ],
+      "id": "692c6e25-d77c-4ded-9983-74cdad5ae38e",
+      "name": "update-2-connection",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": \"connection unblocked\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        752,
+        2064
+      ],
+      "id": "f60f776b-f641-4cfe-9110-9440234a9138",
+      "name": "unblock-success"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2e3ba91f-d375-4c48-a819-49132ed72893",
+              "leftValue": "={{ $json.public_key }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        2384
+      ],
+      "id": "4c486f82-c81f-4bb0-a1fd-1b49499bdba7",
+      "name": "read-if"
+    },
+    {
+      "parameters": {
+        "jsCode": "let list = $input.all()\nlet peers = []\n\nfor(let i=0; i<list.length; i++){\n  peers.push(list[i]['json'])\n}\n\nreturn {\n  peers: peers\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        2288
+      ],
+      "id": "e09a52e5-5092-4fb7-8ca7-b5268db896b5",
+      "name": "list-1-peers"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"peers\": {{ JSON.stringify($json.peers) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        752,
+        2288
+      ],
+      "id": "db7f57e9-0dec-4387-ad6e-6d370169d02b",
+      "name": "peer-1-response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"peers\": []\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        528,
+        2480
+      ],
+      "id": "2511172f-ffa0-45a0-a372-80744cdb8778",
+      "name": "peer-2-response"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "wg-up": {
+      "main": [
+        [
+          {
+            "node": "start-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wg-down": {
+      "main": [
+        [
+          {
+            "node": "stop-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wg-list": {
+      "main": [
+        [
+          {
+            "node": "status-if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "status-if": {
+      "main": [
+        [
+          {
+            "node": "status-success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "status-failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "start": {
+      "main": [
+        [
+          {
+            "node": "store-lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "status": {
+      "main": [
+        [
+          {
+            "node": "wg-list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add": {
+      "main": [
+        [
+          {
+            "node": "wg-1-list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wg-add": {
+      "main": [
+        [
+          {
+            "node": "ip-shift",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "stop": {
+      "main": [
+        [
+          {
+            "node": "wg-down",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "remove": {
+      "main": [
+        [
+          {
+            "node": "wg-remove",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wg-remove": {
+      "main": [
+        [
+          {
+            "node": "delete-peer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "block": {
+      "main": [
+        [
+          {
+            "node": "wg-block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wg-block": {
+      "main": [
+        [
+          {
+            "node": "frame-1-update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "unblock": {
+      "main": [
+        [
+          {
+            "node": "wg-unblock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wg-unblock": {
+      "main": [
+        [
+          {
+            "node": "frame-2-update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "register": {
+      "main": [
+        [
+          {
+            "node": "encrypt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "encrypt": {
+      "main": [
+        [
+          {
+            "node": "format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format": {
+      "main": [
+        [
+          {
+            "node": "create",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create": {
+      "main": [
+        [
+          {
+            "node": "create-interface",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ip-lookup": {
+      "main": [
+        [
+          {
+            "node": "ip-slice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "store": {
+      "main": [
+        [
+          {
+            "node": "register-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "start-if": {
+      "main": [
+        [
+          {
+            "node": "wg-up",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "create-ip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "store-lookup": {
+      "main": [
+        [
+          {
+            "node": "start-if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create-ip": {
+      "main": [
+        [
+          {
+            "node": "ip-store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ip-store": {
+      "main": [
+        [
+          {
+            "node": "wg-1-up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wg-1-up": {
+      "main": [
+        [
+          {
+            "node": "start-1-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ip-slice": {
+      "main": [
+        [
+          {
+            "node": "wg-add",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ip-shift": {
+      "main": [
+        [
+          {
+            "node": "ip-update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ip-update": {
+      "main": [
+        [
+          {
+            "node": "generate-peer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wg-1-list": {
+      "main": [
+        [
+          {
+            "node": "status-1-if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "status-1-if": {
+      "main": [
+        [
+          {
+            "node": "ip-lookup",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "add-failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate-peer": {
+      "main": [
+        [
+          {
+            "node": "save-peer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save-peer": {
+      "main": [
+        [
+          {
+            "node": "add-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "delete-peer": {
+      "main": [
+        [
+          {
+            "node": "list-ip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "list-ip": {
+      "main": [
+        [
+          {
+            "node": "unshift-ip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "unshift-ip": {
+      "main": [
+        [
+          {
+            "node": "update-ip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update-ip": {
+      "main": [
+        [
+          {
+            "node": "remove-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create-interface": {
+      "main": [
+        [
+          {
+            "node": "frame-interface",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "peers": {
+      "main": [
+        [
+          {
+            "node": "read-peers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "read-peers": {
+      "main": [
+        [
+          {
+            "node": "read-if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "qr": {
+      "main": [
+        [
+          {
+            "node": "read-interface",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate-qr": {
+      "main": [
+        [
+          {
+            "node": "qr-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "read-interface": {
+      "main": [
+        [
+          {
+            "node": "generate-qr",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "qr-success": {
+      "main": [
+        []
+      ]
+    },
+    "frame-interface": {
+      "main": [
+        [
+          {
+            "node": "store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "frame-1-update": {
+      "main": [
+        [
+          {
+            "node": "update-1-connection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update-1-connection": {
+      "main": [
+        [
+          {
+            "node": "block-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "frame-2-update": {
+      "main": [
+        [
+          {
+            "node": "update-2-connection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update-2-connection": {
+      "main": [
+        [
+          {
+            "node": "unblock-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "read-if": {
+      "main": [
+        [
+          {
+            "node": "list-1-peers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "peer-2-response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "list-1-peers": {
+      "main": [
+        [
+          {
+            "node": "peer-1-response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "43a78eca-53b3-4845-b8c0-0cc5898b9db4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b2f4e3f5d7a81ba1a3e97c02c033b0f98cd51a2bdec396699ffdae71ab8ebeee"
+  },
+  "id": "YnG0BzG5fiVvJRm5",
+  "tags": []
+}
