@@ -8,8 +8,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        512,
-        -112
+        720,
+        0
       ],
       "id": "67d0550d-dd51-48dc-b78e-e6f60fb9434f",
       "name": "wg-up",
@@ -23,14 +23,14 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": {{ JSON.stringify($json.stderr) }}\n}",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": \"server started successfully\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        704,
-        -112
+        1664,
+        -144
       ],
       "id": "d006436a-e496-4541-8036-4a2ed4d5d1b5",
       "name": "start-success"
@@ -42,8 +42,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        80,
-        432
+        128,
+        608
       ],
       "id": "f5e41655-852d-4a7c-a7ae-8773a3b893b3",
       "name": "wg-down",
@@ -63,8 +63,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        304,
-        432
+        352,
+        608
       ],
       "id": "c7406007-3427-43f9-84e4-41159d5fab40",
       "name": "stop-success"
@@ -76,8 +76,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        80,
-        752
+        128,
+        960
       ],
       "id": "357d2870-5163-443d-8440-cdad7ecc75a6",
       "name": "wg-list",
@@ -116,8 +116,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        288,
-        752
+        336,
+        960
       ],
       "id": "c7175c4e-cdab-493a-8752-6931582cba15",
       "name": "status-if"
@@ -131,8 +131,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        528,
-        656
+        576,
+        864
       ],
       "id": "14a1aa89-690d-4776-88cb-cf038a975d82",
       "name": "status-success"
@@ -146,8 +146,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        528,
-        848
+        576,
+        1056
       ],
       "id": "bf943514-8d18-4107-915b-65f526893fa2",
       "name": "status-failed"
@@ -162,8 +162,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -128,
-        16
+        -112,
+        144
       ],
       "id": "713f75ae-a49a-4ea7-a520-1f9e79a889f7",
       "name": "start",
@@ -185,8 +185,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -128,
-        752
+        -80,
+        960
       ],
       "id": "8a9c4ed0-cb7e-4ecd-9c1f-2a0fbf69b8b7",
       "name": "status",
@@ -209,8 +209,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -128,
-        1184
+        -80,
+        1392
       ],
       "id": "b64421f0-56b9-4ea0-8e54-c5758eb27081",
       "name": "add",
@@ -229,8 +229,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        944,
-        1088
+        992,
+        1296
       ],
       "id": "39013300-93bc-4c9c-a9ef-9bb428f9b721",
       "name": "wg-add",
@@ -251,8 +251,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -128,
-        432
+        -80,
+        608
       ],
       "id": "c56bf681-0933-4687-b01f-446d69b83455",
       "name": "stop",
@@ -273,8 +273,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1968,
-        1088
+        2016,
+        1296
       ],
       "id": "1522356c-d5f9-4556-bf17-b0099b6a3cab",
       "name": "add-success"
@@ -289,8 +289,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -112,
-        1552
+        -64,
+        1760
       ],
       "id": "192b2478-08ec-484b-aedd-f76d0e5dfd64",
       "name": "remove",
@@ -303,8 +303,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        96,
-        1552
+        144,
+        1760
       ],
       "id": "7d9a5f23-845f-4d51-8112-84df4ad291f3",
       "name": "wg-remove",
@@ -324,8 +324,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1152,
-        1552
+        1200,
+        1760
       ],
       "id": "27b1c79d-38a5-444c-a3a4-a2492567e487",
       "name": "remove-success"
@@ -341,8 +341,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -112,
-        1824
+        -64,
+        2032
       ],
       "id": "fe5306f7-8a5b-4f84-8e3d-077d40e16046",
       "name": "block",
@@ -361,8 +361,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        96,
-        1824
+        144,
+        2032
       ],
       "id": "8d226216-a8a8-4677-b367-2872d076f22e",
       "name": "wg-block",
@@ -382,8 +382,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        752,
-        1824
+        800,
+        2032
       ],
       "id": "0d334f1e-2f13-49b5-bb2b-dde61660236d",
       "name": "block-success"
@@ -399,8 +399,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -112,
-        2064
+        -64,
+        2272
       ],
       "id": "cf1075de-f045-40f4-aeca-21f3a0dc2d6e",
       "name": "unblock",
@@ -419,8 +419,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        96,
-        2064
+        144,
+        2272
       ],
       "id": "e8379bb9-8f77-44f0-9dec-fee8ffb0bfbb",
       "name": "wg-unblock",
@@ -539,8 +539,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        528,
-        1088
+        576,
+        1296
       ],
       "id": "2eefc333-d41b-4a9d-b27f-c5b393565248",
       "name": "ip-lookup",
@@ -602,7 +602,7 @@
       "typeVersion": 2.3,
       "position": [
         304,
-        16
+        144
       ],
       "id": "df9697d0-6310-439e-b931-03d9f4c23312",
       "name": "start-if"
@@ -615,8 +615,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        80,
-        16
+        96,
+        144
       ],
       "id": "87d0959a-0f30-4617-94f5-b6f857bafca3",
       "name": "store-lookup",
@@ -637,8 +637,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        512,
-        112
+        544,
+        256
       ],
       "id": "2eecd263-668d-4e21-8198-ab8c28b540e4",
       "name": "create-ip"
@@ -653,8 +653,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        704,
-        112
+        720,
+        256
       ],
       "id": "662492ad-5a6e-4253-836d-20679e3d4d19",
       "name": "ip-store",
@@ -672,8 +672,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        896,
-        112
+        928,
+        256
       ],
       "id": "d4274ed7-b7ab-4db3-8a49-04022b71be8c",
       "name": "wg-1-up",
@@ -693,8 +693,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1072,
-        112
+        1136,
+        256
       ],
       "id": "3b0a8e2d-d4cd-4d4d-be38-02a675ff3c87",
       "name": "start-1-success"
@@ -708,8 +708,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        736,
-        1088
+        784,
+        1296
       ],
       "id": "d82a54ec-a5c2-4019-bec2-2dbeecd1139f",
       "name": "ip-slice"
@@ -721,8 +721,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1152,
-        1088
+        1200,
+        1296
       ],
       "id": "4ae9aa7d-464d-4045-89ca-b2388a0c27b3",
       "name": "ip-shift"
@@ -738,8 +738,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        1360,
-        1088
+        1408,
+        1296
       ],
       "id": "155087ef-3f64-469e-bf5e-ea627a092f73",
       "name": "ip-update",
@@ -757,8 +757,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        80,
-        1184
+        128,
+        1392
       ],
       "id": "9c85718d-5503-4e1c-9c50-bc476d1df015",
       "name": "wg-1-list",
@@ -778,8 +778,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        528,
-        1280
+        576,
+        1488
       ],
       "id": "a5aa9980-8b22-4600-9f74-ef9cd037e8df",
       "name": "add-failed"
@@ -812,8 +812,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        288,
-        1184
+        336,
+        1392
       ],
       "id": "a28d1338-2330-4978-8335-ab8849bc9e0c",
       "name": "status-1-if"
@@ -825,8 +825,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1568,
-        1088
+        1616,
+        1296
       ],
       "id": "a520dbd3-7874-4599-b298-0b0120e19f5c",
       "name": "generate-peer"
@@ -841,8 +841,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        1776,
-        1088
+        1824,
+        1296
       ],
       "id": "9ecf03a2-4c59-4115-b024-cd51dc3eb889",
       "name": "save-peer",
@@ -862,8 +862,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        304,
-        1552
+        352,
+        1760
       ],
       "id": "dcd16982-3d5d-4dda-b84f-7cef8d1b99b4",
       "name": "delete-peer",
@@ -882,8 +882,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        528,
-        1552
+        576,
+        1760
       ],
       "id": "ee206157-4251-42b3-902d-d8d8c4936587",
       "name": "list-ip",
@@ -901,8 +901,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        736,
-        1552
+        784,
+        1760
       ],
       "id": "a02a9195-463f-46d3-a474-7a34a8b1faa9",
       "name": "unshift-ip"
@@ -918,8 +918,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        944,
-        1552
+        992,
+        1760
       ],
       "id": "d99d1d3b-e07d-4bab-8548-126808f2d764",
       "name": "update-ip",
@@ -959,8 +959,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -112,
-        2384
+        -64,
+        2592
       ],
       "id": "3f8b5755-669b-47ca-9f95-2e5e59b5083d",
       "name": "peers",
@@ -981,8 +981,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        96,
-        2384
+        144,
+        2592
       ],
       "id": "06536935-7e7a-4a75-81d3-370f910990a0",
       "name": "read-peers",
@@ -1005,8 +1005,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -128,
-        2672
+        -80,
+        2880
       ],
       "id": "2058e980-678f-47a8-8a42-1da8474d661e",
       "name": "qr",
@@ -1027,8 +1027,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        480,
-        2672
+        528,
+        2880
       ],
       "id": "5e512669-8e67-4009-baa5-4a38fceb9648",
       "name": "qr-success"
@@ -1040,8 +1040,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        272,
-        2672
+        320,
+        2880
       ],
       "id": "4d931092-fb57-4977-8d89-2f0a603d24cf",
       "name": "generate-qr",
@@ -1060,8 +1060,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        64,
-        2672
+        112,
+        2880
       ],
       "id": "797733a7-5200-4add-96d0-846856bf4ff2",
       "name": "read-interface",
@@ -1092,8 +1092,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        304,
-        1824
+        352,
+        2032
       ],
       "id": "7c1a0af5-93d6-4081-b957-8515a848d97d",
       "name": "frame-1-update"
@@ -1109,8 +1109,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        528,
-        1824
+        576,
+        2032
       ],
       "id": "88a68a18-4b8a-4111-b1e5-7711db9b7475",
       "name": "update-1-connection",
@@ -1128,8 +1128,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        304,
-        2064
+        352,
+        2272
       ],
       "id": "f9af986e-a7c0-4a4b-9815-92618f0e380d",
       "name": "frame-2-update"
@@ -1145,8 +1145,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        528,
-        2064
+        576,
+        2272
       ],
       "id": "692c6e25-d77c-4ded-9983-74cdad5ae38e",
       "name": "update-2-connection",
@@ -1166,8 +1166,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        752,
-        2064
+        800,
+        2272
       ],
       "id": "f60f776b-f641-4cfe-9110-9440234a9138",
       "name": "unblock-success"
@@ -1200,8 +1200,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        304,
-        2384
+        352,
+        2592
       ],
       "id": "4c486f82-c81f-4bb0-a1fd-1b49499bdba7",
       "name": "read-if"
@@ -1213,8 +1213,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        528,
-        2288
+        576,
+        2496
       ],
       "id": "e09a52e5-5092-4fb7-8ca7-b5268db896b5",
       "name": "list-1-peers"
@@ -1228,8 +1228,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        752,
-        2288
+        800,
+        2496
       ],
       "id": "db7f57e9-0dec-4387-ad6e-6d370169d02b",
       "name": "peer-1-response"
@@ -1243,11 +1243,151 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        528,
-        2480
+        576,
+        2688
       ],
       "id": "2511172f-ffa0-45a0-a372-80744cdb8778",
       "name": "peer-2-response"
+    },
+    {
+      "parameters": {
+        "collection": "peers",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        928,
+        0
+      ],
+      "id": "45c52d0d-62ee-4141-9d5b-1f7abde02670",
+      "name": "get-peers",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let peers = $input.all()\nlet array = []\n\nfor(let i=0; i<peers.length; i++){\n  array.push(peers[i]['json'])\n}\n\nreturn array"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        0
+      ],
+      "id": "0fea35a9-11ac-4896-9fda-a95d006e323d",
+      "name": "peers-array"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ $input.all().length }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1376,
+        0
+      ],
+      "id": "4b61f51b-38d4-479d-a278-915fe5da89b1",
+      "name": "loop-peers"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7ad1e45a-e829-444b-bdd1-b706d6445068",
+              "leftValue": "={{ $json.connection }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1664,
+        96
+      ],
+      "id": "bcdd6859-eb5a-4c0d-b483-70e7434c3c9c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "command": "=address=10.0.0.{{ $json.ip }} public_key={{ $json.public_key }} private_key={{ $json.private_key }} /root/revive-peer.sh",
+        "cwd": "=/"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        -16
+      ],
+      "id": "c6f5badb-dac5-4091-9c79-1f686f783f37",
+      "name": "add-looped-peers-1",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=Public_key={{ $('loop-peers').item.json.public_key }} /root/block-ip.sh"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        2064,
+        176
+      ],
+      "id": "195eed55-442c-4122-b81f-031f2b428cd1",
+      "name": "wg-block-looped",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=address=10.0.0.{{ $('loop-peers').item.json._id }} public_key={{ $('loop-peers').item.json.public_key }} private_key={{ $('loop-peers').item.json.private_key }} /root/revive-peer.sh",
+        "cwd": "=/"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        176
+      ],
+      "id": "203b0f2c-f430-4cf5-9b1d-ee387883c9eb",
+      "name": "add-looped-peers-2",
+      "credentials": {
+        "sshPassword": {
+          "id": "lGzlFpQEwDks8Okk",
+          "name": "SSH Password account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -1256,7 +1396,7 @@
       "main": [
         [
           {
-            "node": "start-success",
+            "node": "get-peers",
             "type": "main",
             "index": 0
           }
@@ -1834,6 +1974,97 @@
           }
         ]
       ]
+    },
+    "get-peers": {
+      "main": [
+        [
+          {
+            "node": "peers-array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "peers-array": {
+      "main": [
+        [
+          {
+            "node": "loop-peers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "loop-peers": {
+      "main": [
+        [
+          {
+            "node": "start-success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "add-looped-peers-1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "add-looped-peers-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add-looped-peers-1": {
+      "main": [
+        [
+          {
+            "node": "loop-peers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wg-block-looped": {
+      "main": [
+        [
+          {
+            "node": "loop-peers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add-looped-peers-2": {
+      "main": [
+        [
+          {
+            "node": "wg-block-looped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -1841,7 +2072,7 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "43a78eca-53b3-4845-b8c0-0cc5898b9db4",
+  "versionId": "dfc3f2c2-446c-44af-b5bc-66392e13b293",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b2f4e3f5d7a81ba1a3e97c02c033b0f98cd51a2bdec396699ffdae71ab8ebeee"
