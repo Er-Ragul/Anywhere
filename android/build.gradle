@@ -21,8 +21,8 @@ allprojects {
 }
 
 ext {
-    minSdkVersion = 24           // WireGuard requires a higher min SDK than default
-    ndkVersion = "27.1.12297006" // MUST match your installed NDK version exactly
+  minSdkVersion = 24
+  ndkVersion = "27.1.12297006"
 }
 
 apply plugin: "expo-root-project"

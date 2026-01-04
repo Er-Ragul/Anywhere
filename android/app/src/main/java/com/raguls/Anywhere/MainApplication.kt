@@ -1,4 +1,4 @@
-package com.anonymous.Anywhere
+package com.raguls.Anywhere
 
 import android.app.Application
 import android.content.res.Configuration

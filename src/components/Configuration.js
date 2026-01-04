@@ -47,7 +47,19 @@ export default function Configuration() {
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScannedData(data);
-    console.log(data);
+    let scanned = data.split("\n")
+
+    console.log(scanned[5]);
+    
+    setConfig({
+      name: null,
+      private_key: scanned[1].trimStart().split(" ")[2],
+      address: scanned[2].trimStart().split(" ")[2],
+      dns: scanned[3].trimStart().split(" ")[2],
+      public_key: scanned[6].trimStart().split(" ")[2],
+      allowed: scanned[7].trimStart().split(" ")[2],
+      endpoint: scanned[8].trimStart().split(" ")[2]
+    })
     setScan(false)
   };
 
@@ -55,13 +67,13 @@ export default function Configuration() {
     try {
       let template = `[Interface]
       PrivateKey = ${config.private_key}
-      Address = ${config.address}/24
+      Address = ${config.address}
       DNS = ${config.dns}
 
       [Peer]
       PublicKey = ${config.public_key}
       AllowedIPs = ${config.allowed}
-      Endpoint = ${config.endpoint}:51820
+      Endpoint = ${config.endpoint}
       PersistentKeepalive = 25`
 
       let profileList = await AsyncStorage.getItem('profiles')
@@ -307,7 +319,7 @@ export default function Configuration() {
         <CameraView
           facing="back"
           style={StyleSheet.absoluteFillObject}
-          onBarcodeScanned={scannedData ? undefined : handleBarCodeScanned} 
+          onBarcodeScanned={scannedData ? null : handleBarCodeScanned} 
           barcodeScannerSettings={{
             barcodeTypes: ["qr"],
           }}

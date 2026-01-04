@@ -40,8 +40,11 @@ export default function Authentication(){
 
   let checkForHub = async() => {
     let hub = await AsyncStorage.getItem('anywhere-hub')
+    console.log(hub);
+    
+    let login = JSON.parse(hub)['login']
 
-    if(hub != null){
+    if(hub != null && login == true){
       navigation.navigate('Profile')
     }
   }
@@ -49,20 +52,51 @@ export default function Authentication(){
   let register = async() => {
     if(fqdn != null){
       if(password != null){
-        try{
-          let response = await axios.post(`http://${fqdn}/webhook/register`, {endpoint: fqdn, password: password})
-          
-          if(response.data.status == 'success'){
-            await AsyncStorage.setItem('anywhere-hub', JSON.stringify({
-              endpoint: fqdn,
-              token: response.data.result.token,
-              id: response.data.result.id
-            }))
-            navigation.navigate('Profile')
+        let hub = await AsyncStorage.getItem('anywhere-hub')
+
+        if(hub != null){
+          try{
+            let response = await axios.post(`http://${fqdn}/webhook/register`, {token: JSON.parse(hub)['token']})
+            
+            if(response.data.status == 'success'){
+              hub = JSON.parse(hub)
+              hub['login'] = true
+              await AsyncStorage.setItem('anywhere-hub', JSON.stringify(hub))
+              navigation.navigate('Profile')
+            }
+          }
+          catch(err){
+            console.log(err);
           }
         }
-        catch(err){
-          console.log(err);
+        else{
+          try{
+            let response = await axios.post(`http://${fqdn}/webhook/register`, JSON.stringify({
+              interface: "wg0",
+              endpoint: fqdn,
+              password: password
+            }))
+            
+            if(response.data.status == 'success'){
+              await AsyncStorage.setItem('anywhere-hub', JSON.stringify({
+                id: response.data.result.id,
+                endpoint: fqdn,
+                token: response.data.result.token,
+                key: response.data.result.key,
+                login: true
+              }))
+              console.log({
+                id: response.data.result.id,
+                endpoint: fqdn,
+                token: response.data.result.token,
+                key: response.data.result.key
+              });
+              navigation.navigate('Profile')
+            }
+          }
+          catch(err){
+            console.log(err);
+          }
         }
       }
       else{
@@ -174,7 +208,7 @@ export default function Authentication(){
                 </View>
             
                 {/* <TouchableOpacity className="self-end">
-                    <Text className="text-blue-500 font-bold text-sm">Forgot Password?</Text>
+                    <Text className="text-red-500 font-bold text-sm">Factory Reset</Text>
                 </TouchableOpacity> */}
 
                 {/* Connect Button */}
@@ -203,7 +237,7 @@ export default function Authentication(){
                     >
                     {/* <FileUp size={18} color="#71717a" className="mr-3" /> */}
                     <Text className="text-zinc-300 font-bold text-base">
-                        Back To VPN Client
+                        VPN Client
                     </Text>
                 </TouchableOpacity>
 

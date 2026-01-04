@@ -21,11 +21,13 @@ import {
   Server, 
   LayersPlus,
   Power,
-  PowerOff
+  PowerOff,
+  LogOut
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import QRCode from 'react-native-qrcode-svg';
 import axios from 'axios';
 
 export default function Profiles() {
@@ -35,8 +37,8 @@ export default function Profiles() {
   let nameRef = useRef(null)
   let [running, setRunning] = useState(false)
   let [clients, setClients] = useState([])
-  let [power, setPower] = useState(false)
   let [modal, setModal] = useState(false)
+  let [showQr, setShowQr] = useState({template: null, show: false})
 
   useEffect(() => {
     retriveCreds()
@@ -68,7 +70,6 @@ export default function Profiles() {
       }
       else if(result.data.status == 'failed'){
         setRunning(false)
-        getClients()
       }
       else{
         Alert.alert('Something went wrong')
@@ -129,6 +130,10 @@ export default function Profiles() {
         if(result.data.status == 'success'){
           setRunning(true)
           getClients()
+        }
+        else{
+          serverStatus()
+          console.log('Something went wrong');
         }
       }
       catch(err){
@@ -249,7 +254,54 @@ export default function Profiles() {
     }
   }
 
-  let ModalViewer = () => {
+  let logOut = async() => {
+    let hub = await AsyncStorage.getItem('anywhere-hub')
+    hub = JSON.parse(hub)
+    hub['login'] = false
+    await AsyncStorage.setItem('anywhere-hub', JSON.stringify(hub))
+    navigation.navigate('Authentication')    
+  }
+
+  let factoryReset = async() => {
+    try {
+      await AsyncStorage.removeItem('anywhere-hub')
+      let result = await axios.get(`http://${serverRef.current.endpoint}/webhook/factory-reset`, {
+        headers: {
+          'Authorization': `Bearer ${serverRef.current.token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if(result.data.status == 'success'){
+        getClients()
+        Alert.alert('Factory reset done')
+        navigation.navigate('Authentication')
+      }
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+
+  let generateQr = async(client) => {
+    let payload = await AsyncStorage.getItem('anywhere-hub')
+    payload = JSON.parse(payload)
+    
+    let template = `[Interface]
+    PrivateKey = ${client.private_key}
+    Address = 10.0.0.${client.ip}/24
+    DNS = 8.8.8.8
+
+    [Peer]
+    PublicKey = ${payload.key}
+    AllowedIPs = 0.0.0.0/0,::/0
+    Endpoint = ${payload.endpoint}
+    PersistentKeepalive = 25`
+
+    setShowQr({template: template, show: !showQr.show})
+  }
+
+  let ModalForClient = () => {
     return(
     <Modal visible={modal}>
         <View className="flex-1 bg-[#0a0a0b]">
@@ -320,12 +372,15 @@ export default function Profiles() {
 
                     {/* Connect Button */}
                     <TouchableOpacity 
-                    activeOpacity={0.9}
-                    className="bg-white h-[56px] rounded-[24px] flex-row items-center justify-center mt-4 shadow-lg shadow-white/10"
-                    onPress={addClient}
-                    >
-                    <Text className="text-black text-xl font-black mr-2">Add</Text>
-                    <LayersPlus size={22} color="black" strokeWidth={3} />
+                      activeOpacity={0.9}
+                      className="bg-white h-[56px] rounded-[24px] flex-row items-center justify-center mt-4 shadow-lg shadow-white/10"
+                      onPress={addClient}
+                      >
+                      <Text className="text-black text-xl font-black mr-2">Add</Text>
+                      <LayersPlus size={22} color="black" strokeWidth={3} />
+                    </TouchableOpacity>
+                    <TouchableOpacity className="self-center" onPress={() => setModal(!modal)}>
+                        <Text className="text-red-500 font-bold text-sm">Cancel</Text>
                     </TouchableOpacity>
                 </View>
                 </View>
@@ -334,6 +389,53 @@ export default function Profiles() {
         </SafeAreaView>
         </View>
     </Modal>
+    )
+  }
+
+  let ModalForQr = () => {
+    return(
+      <Modal visible={showQr.show}>
+        <View className="flex-1 bg-[#0a0a0b]">
+        {/* 
+            Ensure Status bar is translucent on Android 
+            to allow KeyboardAvoidingView to calculate offsets correctly 
+        */}
+        <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+        
+        <LinearGradient
+            colors={['#1f2128', '#0a0a0b']}
+            className="absolute inset-0"
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 0.4 }}
+        />
+
+        <SafeAreaView className="flex-1">
+           <View className="flex-1 justify-center px-10 py-10">
+                {/* Logo Section */}
+                <View className="items-center mb-10">
+                    <Text className="text-zinc-500 text-lg mt-2 text-center font-medium">
+                      Scan QR
+                    </Text>
+                </View>
+                {/* Qr display */}
+                <View className="items-center mb-10 bg-white p-5">
+                  <QRCode
+                    value={showQr.template}
+                    size={300}
+                    color='black'
+                    backgroundColor='white'
+                  />
+                </View>
+                {/* Form Section */}
+                <View className="gap-y-6">
+                  <TouchableOpacity className="self-center" onPress={() => setShowQr((prev) => ({...prev, show: !showQr.show}))}>
+                      <Text className="text-pink-500 font-bold text-lg">Close</Text>
+                  </TouchableOpacity>
+                </View>
+            </View>
+        </SafeAreaView>
+        </View>
+      </Modal>
     )
   }
 
@@ -347,24 +449,32 @@ export default function Profiles() {
       >
         {/* Header */}
         <View className="flex-row justify-between items-center px-6 py-4">
+          {/*
           <View className="flex-row gap-x-3">
             <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={() => navigation.navigate('VPN')}>
               <GlobeLock size={24} color="white" />
             </TouchableOpacity>
           </View>
+          */}
           <Text className="text-white text-2xl font-bold tracking-tight">
             Anywhere Hub
           </Text>
           <View className="flex-row gap-x-3">
+            <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={() => navigation.navigate('VPN')}>
+              <GlobeLock size={24} color="white" />
+            </TouchableOpacity>
             {
               running ?
               <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={makeTheServer}>
                 <Power size={24} color="green" />
               </TouchableOpacity>:
-              <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={makeTheServer}>
+              <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={makeTheServer} onLongPress={factoryReset}>
                 <PowerOff size={24} color="red" />
               </TouchableOpacity>
             }
+            <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={logOut}>
+              <LogOut size={24} color="white" />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -397,7 +507,7 @@ export default function Profiles() {
                   <TouchableOpacity className="mx-2" onPress={() => removeClient(client)}>
                     <Trash2 size={22} color="white" />
                   </TouchableOpacity>
-                  <TouchableOpacity className="mx-2">
+                  <TouchableOpacity className="mx-2" onPress={() => generateQr(client) }>
                     <QrCode size={22} color="white" />
                   </TouchableOpacity>
                   <TouchableOpacity className={`ml-2 w-12 h-7 bg-black rounded-full px-1 justify-center ${client.connection ? 'items-end' : 'items-start'} border border-zinc-800`} onPress={() => makeTheConnection(client)}>
@@ -419,7 +529,8 @@ export default function Profiles() {
         </TouchableOpacity>
 
       </SafeAreaView>
-      <ModalViewer />
+      <ModalForClient />
+      <ModalForQr />
     </View>
   );
 }
