@@ -49,8 +49,6 @@ export default function Configuration() {
     setScannedData(data);
     let scanned = data.split("\n")
 
-    console.log(scanned[5]);
-    
     setConfig({
       name: null,
       private_key: scanned[1].trimStart().split(" ")[2],
@@ -127,7 +125,7 @@ export default function Configuration() {
         style={{ paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }}
       >
         <View className="flex-row items-center justify-between px-6 py-4">
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.goBack()}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Connection')}>
             <X size={24} color="#000" />
           </TouchableOpacity>
           

@@ -31,6 +31,7 @@ export default function Authentication(){
   const navigation = useNavigation()
   let [fqdn, setFqdn] = useState(null)
   let [password, setPassword] = useState(null)
+  let [relogin, setRelogin] = useState(false)
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   useEffect(() => {
@@ -45,7 +46,11 @@ export default function Authentication(){
     let login = JSON.parse(hub)['login']
 
     if(hub != null && login == true){
-      navigation.navigate('Profile')
+      navigation.replace('Profile')
+    }
+    else if (hub != null && login == false){
+      setRelogin(true)
+      setFqdn(JSON.parse(hub)['endpoint'])
     }
   }
 
@@ -56,13 +61,20 @@ export default function Authentication(){
 
         if(hub != null){
           try{
-            let response = await axios.post(`http://${fqdn}/webhook/register`, {token: JSON.parse(hub)['token']})
+            let response = await axios.post(`http://${fqdn}/webhook/register`, {
+              uid: JSON.parse(hub)['uid'],
+              password: password,
+            })
             
             if(response.data.status == 'success'){
               hub = JSON.parse(hub)
               hub['login'] = true
+              hub['token'] = response.data.result.token
               await AsyncStorage.setItem('anywhere-hub', JSON.stringify(hub))
-              navigation.navigate('Profile')
+              navigation.replace('Profile')
+            }
+            else if(response.data.status == 'failed'){
+              Alert.alert('Invalid Password')
             }
           }
           catch(err){
@@ -71,14 +83,16 @@ export default function Authentication(){
         }
         else{
           try{
-            let response = await axios.post(`http://${fqdn}/webhook/register`, JSON.stringify({
+            let response = await axios.post(`http://${fqdn}/webhook/register`, {
               interface: "wg0",
               endpoint: fqdn,
-              password: password
-            }))
+              password: password,
+              uid: 'noid'
+            })
             
             if(response.data.status == 'success'){
               await AsyncStorage.setItem('anywhere-hub', JSON.stringify({
+                uid: response.data.result.uid,
                 id: response.data.result.id,
                 endpoint: fqdn,
                 token: response.data.result.token,
@@ -86,10 +100,12 @@ export default function Authentication(){
                 login: true
               }))
               console.log({
+                uid: response.data.result.uid,
                 id: response.data.result.id,
                 endpoint: fqdn,
                 token: response.data.result.token,
-                key: response.data.result.key
+                key: response.data.result.key,
+                login: true
               });
               navigation.navigate('Profile')
             }
@@ -181,6 +197,7 @@ export default function Authentication(){
                       autoCapitalize="none"
                       underlineColorAndroid="transparent"
                       onChangeText={(value) => setFqdn(value)}
+                      editable={!relogin}
                     />
                   </View>
                 </View>
@@ -217,7 +234,7 @@ export default function Authentication(){
                   className="bg-white h-[56px] rounded-[24px] flex-row items-center justify-center mt-4 shadow-lg shadow-white/10"
                   onPress={register}
                 >
-                  <Text className="text-black text-xl font-black mr-2">Register</Text>
+                  <Text className="text-black text-xl font-black mr-2">{ relogin ? 'Login' : 'Register' }</Text>
                   <ArrowRight size={22} color="black" strokeWidth={3} />
                 </TouchableOpacity>
               </View>

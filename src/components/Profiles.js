@@ -295,7 +295,7 @@ export default function Profiles() {
     [Peer]
     PublicKey = ${payload.key}
     AllowedIPs = 0.0.0.0/0,::/0
-    Endpoint = ${payload.endpoint}
+    Endpoint = ${payload.endpoint.split(':')[0]}:51820
     PersistentKeepalive = 25`
 
     setShowQr({template: template, show: !showQr.show})
