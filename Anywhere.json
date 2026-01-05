@@ -8,8 +8,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        688,
-        96
+        704,
+        176
       ],
       "id": "67d0550d-dd51-48dc-b78e-e6f60fb9434f",
       "name": "wg-up",
@@ -29,8 +29,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1632,
-        -48
+        1648,
+        32
       ],
       "id": "d006436a-e496-4541-8036-4a2ed4d5d1b5",
       "name": "start-success"
@@ -162,8 +162,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -128,
-        240
+        -112,
+        320
       ],
       "id": "713f75ae-a49a-4ea7-a520-1f9e79a889f7",
       "name": "start",
@@ -459,8 +459,8 @@
       "type": "n8n-nodes-base.jwt",
       "typeVersion": 1,
       "position": [
-        320,
-        -496
+        384,
+        -512
       ],
       "id": "cd3d600d-a870-4b0a-9b1b-f3e11958871a",
       "name": "encrypt",
@@ -488,8 +488,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        544,
-        -496
+        608,
+        -512
       ],
       "id": "02949a87-a8f4-43f2-9c64-abfcd62fc526",
       "name": "format"
@@ -504,8 +504,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        752,
-        -496
+        816,
+        -512
       ],
       "id": "51d5ac07-c348-467f-a29f-0f9dabb0c72b",
       "name": "create",
@@ -546,8 +546,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        1376,
-        -496
+        1440,
+        -512
       ],
       "id": "12291ee0-2442-465a-99b7-10d9ce13c679",
       "name": "store",
@@ -586,8 +586,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        272,
-        240
+        288,
+        320
       ],
       "id": "df9697d0-6310-439e-b931-03d9f4c23312",
       "name": "start-if"
@@ -600,8 +600,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        64,
-        240
+        80,
+        320
       ],
       "id": "87d0959a-0f30-4617-94f5-b6f857bafca3",
       "name": "store-lookup",
@@ -622,8 +622,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        512,
-        352
+        528,
+        432
       ],
       "id": "2eecd263-668d-4e21-8198-ab8c28b540e4",
       "name": "create-ip"
@@ -638,8 +638,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        688,
-        352
+        704,
+        432
       ],
       "id": "662492ad-5a6e-4253-836d-20679e3d4d19",
       "name": "ip-store",
@@ -657,8 +657,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        896,
-        352
+        912,
+        432
       ],
       "id": "d4274ed7-b7ab-4db3-8a49-04022b71be8c",
       "name": "wg-1-up",
@@ -678,8 +678,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1104,
-        352
+        1120,
+        432
       ],
       "id": "3b0a8e2d-d4cd-4d4d-be38-02a675ff3c87",
       "name": "start-1-success"
@@ -922,8 +922,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        960,
-        -496
+        1024,
+        -512
       ],
       "id": "fe825c4a-9abf-470e-89fd-fc14379a9f59",
       "name": "create-interface",
@@ -986,8 +986,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1168,
-        -496
+        1232,
+        -512
       ],
       "id": "e99d3311-9def-4607-81b2-a923d89fd546",
       "name": "frame-interface"
@@ -1164,8 +1164,8 @@
       "type": "n8n-nodes-base.mongoDb",
       "typeVersion": 1.2,
       "position": [
-        896,
-        96
+        912,
+        176
       ],
       "id": "45c52d0d-62ee-4141-9d5b-1f7abde02670",
       "name": "get-peers",
@@ -1183,8 +1183,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1104,
-        96
+        1120,
+        176
       ],
       "id": "0fea35a9-11ac-4896-9fda-a95d006e323d",
       "name": "peers-array"
@@ -1197,8 +1197,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1344,
-        96
+        1360,
+        176
       ],
       "id": "4b61f51b-38d4-479d-a278-915fe5da89b1",
       "name": "loop-peers"
@@ -1231,8 +1231,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1632,
-        192
+        1648,
+        272
       ],
       "id": "bcdd6859-eb5a-4c0d-b483-70e7434c3c9c",
       "name": "If"
@@ -1245,8 +1245,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        1840,
-        80
+        1856,
+        160
       ],
       "id": "c6f5badb-dac5-4091-9c79-1f686f783f37",
       "name": "add-looped-peers-1",
@@ -1264,8 +1264,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        2032,
-        272
+        2048,
+        352
       ],
       "id": "195eed55-442c-4122-b81f-031f2b428cd1",
       "name": "wg-block-looped",
@@ -1284,8 +1284,8 @@
       "type": "n8n-nodes-base.ssh",
       "typeVersion": 1,
       "position": [
-        1840,
-        272
+        1856,
+        352
       ],
       "id": "203b0f2c-f430-4cf5-9b1d-ee387883c9eb",
       "name": "add-looped-peers-2",
@@ -1464,12 +1464,11 @@
           "conditions": [
             {
               "id": "77dbeff1-7003-47ac-96b7-6c4a2c4ec081",
-              "leftValue": "={{ $json.body.token }}",
-              "rightValue": "null",
+              "leftValue": "={{ $json.body.uid }}",
+              "rightValue": "noid",
               "operator": {
                 "type": "string",
-                "operation": "notExists",
-                "singleValue": true
+                "operation": "equals"
               }
             }
           ],
@@ -1489,14 +1488,14 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": {\n    \"id\": \"{{ $json._id }}\",\n    \"token\": \"{{ $('encrypt').item.json.token }}\",\n    \"key\": \"{{ JSON.parse($('create-interface').item.json.stdout)['public_key'] }}\"\n  }\n}",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": {\n    \"uid\": \"{{ $('create').item.json._id }}\",\n    \"id\": \"{{ $json._id }}\",\n    \"token\": \"{{ $('encrypt').item.json.token }}\",\n    \"key\": \"{{ JSON.parse($('create-interface').item.json.stdout)['public_key'] }}\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1568,
-        -496
+        1632,
+        -512
       ],
       "id": "12ea3f73-dab2-4b52-9179-5a52dc3e4d15",
       "name": "register-1-success"
@@ -1504,17 +1503,164 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": \"User already exist\"\n}",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"result\": {\n    \"uid\": \"{{ $('register').item.json.body.id }}\",\n    \"token\": \"{{ $json.password }}\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        320,
-        -224
+        1632,
+        -320
       ],
       "id": "8e68c4dd-9076-42c3-b3b9-ad191355f151",
       "name": "register-2-success"
+    },
+    {
+      "parameters": {
+        "collection": "passwords",
+        "options": {},
+        "query": "={ \n  \"$expr\": { \n    \"$eq\": [\n      \"$_id\", \n      { \"$toObjectId\": \"{{ $('register').item.json.body.uid }}\" }\n    ] \n  }\n}"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        -240
+      ],
+      "id": "8cc2181d-3420-4fca-9aef-3a2f5f40ccd0",
+      "name": "find-password",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "decode",
+        "token": "={{ $json.password }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.jwt",
+      "typeVersion": 1,
+      "position": [
+        592,
+        -240
+      ],
+      "id": "cbf9aa10-2ce2-4f54-9021-a82667b80685",
+      "name": "decode",
+      "credentials": {
+        "jwtAuth": {
+          "id": "rg81tMyTpOOkRR7E",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "986f9cad-74bc-4dea-b5f6-a872153b9380",
+              "leftValue": "={{ $('register').item.json.body.password }}",
+              "rightValue": "={{ $json.payload.password }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        800,
+        -240
+      ],
+      "id": "6e325102-ebfc-4e73-9259-fc2dcb637835",
+      "name": "password-if"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"failed\",\n  \"result\": \"Invalid password\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1024,
+        -112
+      ],
+      "id": "dede9d99-5a4a-425d-8684-13b4a1a2b73c",
+      "name": "register-2-failed"
+    },
+    {
+      "parameters": {
+        "useJson": true,
+        "claimsJson": "={\n  \"password\": \"{{ $('register').item.json.body.password }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.jwt",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        -320
+      ],
+      "id": "9d0bcd11-5264-4f22-a248-64d1996bf96b",
+      "name": "new-sign",
+      "credentials": {
+        "jwtAuth": {
+          "id": "rg81tMyTpOOkRR7E",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "findOneAndUpdate",
+        "collection": "passwords",
+        "updateKey": "_id",
+        "fields": "password",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        1440,
+        -320
+      ],
+      "id": "5602afff-5650-4e28-9323-b20d5c17a32b",
+      "name": "update-password",
+      "credentials": {
+        "mongoDb": {
+          "id": "N7Ue7vLGeFFyyQWB",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  _id: $('register').first().json.body.uid,\n  password: $input.first().json.token\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        -320
+      ],
+      "id": "c9bf39b5-8d46-4237-b671-9953f8dcc113",
+      "name": "frame-update"
     }
   ],
   "pinData": {},
@@ -2243,7 +2389,80 @@
         ],
         [
           {
+            "node": "find-password",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "find-password": {
+      "main": [
+        [
+          {
+            "node": "decode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "decode": {
+      "main": [
+        [
+          {
+            "node": "password-if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "password-if": {
+      "main": [
+        [
+          {
+            "node": "new-sign",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "register-2-failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "new-sign": {
+      "main": [
+        [
+          {
+            "node": "frame-update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update-password": {
+      "main": [
+        [
+          {
             "node": "register-2-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "frame-update": {
+      "main": [
+        [
+          {
+            "node": "update-password",
             "type": "main",
             "index": 0
           }
@@ -2256,7 +2475,7 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "2b0f342c-325d-4ced-a623-e382dcba72c4",
+  "versionId": "675ac6bb-e5fd-4a7d-b8ed-ec10b8b48dd5",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b2f4e3f5d7a81ba1a3e97c02c033b0f98cd51a2bdec396699ffdae71ab8ebeee"
