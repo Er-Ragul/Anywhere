@@ -25,9 +25,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import WireGuardModule from '../wireguard/WireGuardModule';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { updateDuration, updateTransfer } from '../redux/variableSlice';
 
 export default function VPN() {
 
+  let dispatch = useDispatch()
   let [isConnected, setIsConnected] = useState(false)
   let [config, setConfig] = useState(null)
   const lastStatsRef = useRef({ rx: 0, tx: 0, timestamp: Date.now() });
@@ -35,7 +37,6 @@ export default function VPN() {
   const statsIntervalRef = useRef(null);
   let [transfer, setTransfer] = useState({Rx: [0, 'B'], Tx: [0, 'B']})
   let [duration, setDuration] = useState('0')
-  let speedRef = useRef(null)
   const navigation = useNavigation()
 
   useEffect(() => {
@@ -51,6 +52,7 @@ export default function VPN() {
           const m = Math.floor(diff / 60).toString().padStart(2, '0');
           const s = (diff % 60).toString().padStart(2, '0');
           setDuration(`${m}:${s}`);
+          dispatch(updateDuration(`${m}:${s}`));
         }, 1000);
       } 
       else{
@@ -61,6 +63,7 @@ export default function VPN() {
           const m = Math.floor(diff / 60).toString().padStart(2, '0');
           const s = (diff % 60).toString().padStart(2, '0');
           setDuration(`${m}:${s}`);
+          dispatch(updateDuration(`${m}:${s}`));
         }, 1000);
       }
     }
@@ -88,6 +91,10 @@ export default function VPN() {
                   Rx: [formatSpeed(rxSpeed), getSpeedUnit(rxSpeed)],
                   Tx: [formatSpeed(txSpeed), getSpeedUnit(rxSpeed)]
                 })
+                dispatch(                updateTransfer({
+                  Rx: [formatSpeed(rxSpeed), getSpeedUnit(rxSpeed)],
+                  Tx: [formatSpeed(txSpeed), getSpeedUnit(rxSpeed)]
+                }))
                 // Note: We could save the unit in state too if we want dynamic units
 
                 lastStatsRef.current = {
@@ -167,18 +174,21 @@ export default function VPN() {
       colors={['#1a1d24', '#0a0b0d']}
       className="flex-1"
     >
-      {/* Set status bar to light and transparent so the gradient shows behind it */}
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       
       <SafeAreaView 
         className="flex-1"
-        // This style fix ensures Android devices respect the status bar height
         style={{ paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }}
       >
-        {/* Header */}
-        <View className="flex-row justify-between items-center px-6 py-4">
-          <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50"
-          onPress={() => navigation.navigate('Configuration')}>
+        {/* 
+            HEADER WRAPPER: 
+            max-w-2xl and self-center ensures it stays centered on tablets.
+        */}
+        <View className="w-full max-w-2xl self-center flex-row justify-between items-center px-6 py-4">
+          <TouchableOpacity 
+            className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50"
+            onPress={() => navigation.navigate('Configuration')}
+          >
             <ShieldPlus size={24} color="#ffffff" />
           </TouchableOpacity>
           
@@ -186,7 +196,10 @@ export default function VPN() {
             Anywhere
           </Text>
 
-          <TouchableOpacity className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" onPress={() => navigation.navigate('Authentication')}>
+          <TouchableOpacity 
+            className="w-12 h-12 bg-zinc-800/40 rounded-sm items-center justify-center border border-zinc-700/50" 
+            onPress={() => navigation.navigate('Authentication')}
+          >
             <Server size={24} color="#ffffff" />
           </TouchableOpacity>
         </View>
@@ -195,97 +208,102 @@ export default function VPN() {
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
         >
-          
-          {/* Status Section */}
-          <View className="items-center mt-6">
-            <View className="flex-row items-center bg-emerald-500/10 border border-emerald-500/30 px-4 py-1.5 rounded-full mb-6">
-              <View className="w-2 h-2 rounded-full bg-emerald-400 mr-2" />
-              <Text className="text-emerald-400 text-[10px] font-bold tracking-widest uppercase">
-                Encrypted
+          {/* 
+              CONTENT WRAPPER:
+              All body content is now inside this centering container.
+          */}
+          <View className="w-full max-w-2xl self-center">
+            
+            {/* Status Section */}
+            <View className="items-center mt-6">
+              <View className="flex-row items-center bg-emerald-500/10 border border-emerald-500/30 px-4 py-1.5 rounded-full mb-6">
+                <View className="w-2 h-2 rounded-full bg-emerald-400 mr-2" />
+                <Text className="text-emerald-400 text-[10px] font-bold tracking-widest uppercase">
+                  Encrypted
+                </Text>
+              </View>
+              
+              <Text className="text-white text-5xl font-bold tracking-tight text-center">
+                { config != null && config.connected == true ? 'Connected' : 'Disconnected' }
               </Text>
             </View>
-            
-            <Text className="text-white text-5xl font-bold tracking-tight">
-              { config != null && config.connected == true ? 'Connected' : 'Disconnected' }
-            </Text>
-            {/* <Text className="text-zinc-400 text-lg mt-1">
-              Germany - DE1
-            </Text> */}
-          </View>
 
-          {/* Power Button */}
-          <View className="items-center justify-center my-10">
-            <View className="w-72 h-72 rounded-full border border-emerald-500/5 items-center justify-center">
-              <View className="w-60 h-60 rounded-full border border-emerald-500/10 items-center justify-center">
-                <TouchableOpacity 
-                  activeOpacity={0.8}
-                  className={`w-44 h-44 rounded-full ${config != null && config.connected == true ? 'bg-emerald-500' : 'bg-red-500'} items-center justify-center`}
-                  style={{
-                    shadowColor: `${ config != null && config.connected ? '#10b981' : '#ef4444' }`,
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.6,
-                    shadowRadius: 30,
-                    elevation: 15,
-                  }}
-                  onPress={toggleConnection}
-                >
-                  { 
-                    config != null && config.connected == true ? 
-                    <Power size={60} color="white" strokeWidth={2.5} /> : <PowerOff size={60} color="white" strokeWidth={2.5} />
-                  }
-                </TouchableOpacity>
+            {/* Power Button */}
+            <View className="items-center justify-center my-10">
+              <View className="w-72 h-72 rounded-full border border-emerald-500/5 items-center justify-center">
+                <View className="w-60 h-60 rounded-full border border-emerald-500/10 items-center justify-center">
+                  <TouchableOpacity 
+                    activeOpacity={0.8}
+                    className={`w-44 h-44 rounded-full ${config != null && config.connected == true ? 'bg-emerald-500' : 'bg-red-500'} items-center justify-center`}
+                    style={{
+                      shadowColor: `${ config != null && config.connected ? '#10b981' : '#ef4444' }`,
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.6,
+                      shadowRadius: 30,
+                      elevation: 15,
+                    }}
+                    onPress={toggleConnection}
+                  >
+                    { 
+                      config != null && config.connected == true ? 
+                      <Power size={60} color="white" strokeWidth={2.5} /> : <PowerOff size={60} color="white" strokeWidth={2.5} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+
+            {/* Current Server Card */}
+            <View className="px-6 mb-6">
+              <TouchableOpacity 
+                className="bg-zinc-900/60 border border-zinc-800/80 p-5 rounded-[16px] flex-row items-center" 
+                onPress={() => navigation.navigate('Connection')}
+              >
+                {
+                  config != null ? <ShieldCheck size={32} color="#ffffff" /> : <ShieldX size={32} color="#ffffff" />
+                }
+                <View className="flex-1 ml-4">
+                  <Text className="text-zinc-500 text-[10px] font-bold tracking-widest uppercase mb-0.5">
+                    Connection Profile
+                  </Text>
+                  <Text className="text-white text-lg font-bold">
+                    { config != null ? config.name : 'Not Found' }
+                  </Text>
+                </View>
+
+                <View className="bg-zinc-800/80 p-2.5 rounded-full">
+                  <ChevronRight size={20} color="#64748b" />
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            {/* Stats Row */}
+            <View className="flex-row px-5 justify-between">
+              <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[16px] p-5 items-center mx-1">
+                <View className="bg-zinc-800/50 p-2 rounded-full mb-3">
+                  <ArrowUp size={18} color="#94a3b8" />
+                </View>
+                <Text className="text-white text-2xl font-bold">{transfer.Tx[0]}</Text>
+                <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">{transfer.Tx[1]}</Text>
+              </View>
+
+              <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[16px] p-5 items-center mx-1">
+                <View className="bg-zinc-800/50 p-2 rounded-full mb-3">
+                  <ArrowDown size={18} color="#94a3b8" />
+                </View>
+                <Text className="text-white text-2xl font-bold">{transfer.Rx[0]}</Text>
+                <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">{transfer.Rx[1]}</Text>
+              </View>
+
+              <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[16px] p-5 items-center mx-1">
+                <View className="bg-zinc-800/50 p-2 rounded-full mb-3">
+                  <Clock size={18} color="#94a3b8" />
+                </View>
+                <Text className="text-white text-2xl font-bold">{duration}</Text>
+                <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">Time</Text>
               </View>
             </View>
           </View>
-
-          {/* Current Server Card */}
-          <View className="px-6 mb-6">
-            <TouchableOpacity className="bg-zinc-900/60 border border-zinc-800/80 p-5 rounded-[16px] flex-row items-center" onPress={() => navigation.navigate('Connection')}>
-              {
-                config != null ? <ShieldCheck size={32} color="#ffffff" /> : <ShieldX size={32} color="#ffffff" />
-              }
-              <View className="flex-1 ml-4">
-                <Text className="text-zinc-500 text-[10px] font-bold tracking-widest uppercase mb-0.5">
-                  Connection Profile
-                </Text>
-                <Text className="text-white text-lg font-bold">
-                  { config != null ? config.name : 'Not Found' }
-                </Text>
-              </View>
-
-              <View className="bg-zinc-800/80 p-2.5 rounded-full">
-                <ChevronRight size={20} color="#64748b" />
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          {/* Stats Row */}
-          <View className="flex-row px-5 justify-between">
-            <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[16px] p-5 items-center mx-1">
-              <View className="bg-zinc-800/50 p-2 rounded-full mb-3">
-                <ArrowUp size={18} color="#94a3b8" />
-              </View>
-              <Text className="text-white text-2xl font-bold">{transfer.Tx[0]}</Text>
-              <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">{transfer.Tx[1]}</Text>
-            </View>
-
-            <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[16px] p-5 items-center mx-1">
-              <View className="bg-zinc-800/50 p-2 rounded-full mb-3">
-                <ArrowDown size={18} color="#94a3b8" />
-              </View>
-              <Text className="text-white text-2xl font-bold">{transfer.Rx[0]}</Text>
-              <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">{transfer.Rx[1]}</Text>
-            </View>
-
-            <View className="flex-1 bg-zinc-900/60 border border-zinc-800/80 rounded-[16px] p-5 items-center mx-1">
-              <View className="bg-zinc-800/50 p-2 rounded-full mb-3">
-                <Clock size={18} color="#94a3b8" />
-              </View>
-              <Text className="text-white text-2xl font-bold">{duration}</Text>
-              <Text className="text-zinc-500 text-[10px] font-bold mt-1 tracking-widest uppercase">Time</Text>
-            </View>
-          </View>
-
         </ScrollView>
 
         {/* Bottom Home Indicator Bar */}

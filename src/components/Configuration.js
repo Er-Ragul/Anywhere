@@ -118,20 +118,19 @@ export default function Configuration() {
     <ScrollView>
     <View className="flex-1 bg-slate-100">
       <StatusBar barStyle="dark-content" />
-      
-      {/* Header padding for Android */}
-      <SafeAreaView 
+
+      {/* HEADER SECTION */}
+      <SafeAreaView
         className="bg-white border-b border-slate-200"
         style={{ paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }}
       >
-        <View className="flex-row items-center justify-between px-6 py-4">
+        {/* Tablet Centering: w-full max-w-2xl self-center */}
+        <View className="w-full max-w-2xl self-center flex-row items-center justify-between px-6 py-4">
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Connection')}>
             <X size={24} color="#000" />
           </TouchableOpacity>
-          
-          <Text className="text-slate-900 text-lg font-bold">
-            Add Configuration
-          </Text>
+
+          <Text className="text-slate-900 text-lg font-bold">Add Configuration</Text>
 
           <TouchableOpacity activeOpacity={0.7} onPress={openQrScanner}>
             <QrCode size={24} color="#000" />
@@ -139,154 +138,132 @@ export default function Configuration() {
         </View>
       </SafeAreaView>
 
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
       >
-        <ScrollView 
-          className="flex-1 px-6"
-          showsVerticalScrollIndicator={false}
-        >
-          
-        {/* Interface Settings Section */}
-        <View className="mt-4">
-          <Text className="text-slate-900 text-xl font-bold mb-6">
-            Interface
-          </Text>
+        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+          {/* MAIN CONTENT CONTAINER */}
+          {/* Tablet Centering: max-w-2xl self-center */}
+          <View className="w-full max-w-2xl self-center px-6 pb-10">
+            
+            {/* Interface Settings Section */}
+            <View className="mt-4">
+              <Text className="text-slate-900 text-xl font-bold mb-6">Interface</Text>
 
-          <View className="mb-6">
-            <Text className="text-slate-600 font-bold mb-2 ml-1">
-              Interface Name
-            </Text>
-            <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
-              <TextInput
-                placeholder='US Server'
-                className="flex-1 text-slate-900 text-base"
-                placeholderTextColor="#a9a9a9"
-                value={config.name}
-                onChangeText={(value) => setConfig({...config, name: value})}
-              />
+              <View className="mb-6">
+                <Text className="text-slate-600 font-bold mb-2 ml-1">Interface Name</Text>
+                <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
+                  <TextInput
+                    placeholder="US Server"
+                    className="flex-1 text-slate-900 text-base h-12"
+                    placeholderTextColor="#a9a9a9"
+                    value={config.name}
+                    onChangeText={(value) => setConfig({ ...config, name: value })}
+                  />
+                </View>
+              </View>
+
+              <View className="mb-6">
+                <Text className="text-slate-600 font-bold mb-2 ml-1">Private Key</Text>
+                <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
+                  <TextInput
+                    secureTextEntry={!visible}
+                    value={config.private_key}
+                    className="flex-1 text-slate-900 text-base h-12"
+                    placeholder="bmXOC+pV1u3zDad9eTB+"
+                    placeholderTextColor="#a9a9a9"
+                    onChangeText={(value) => setConfig({ ...config, private_key: value })}
+                  />
+                  <TouchableOpacity className="ml-3" onPress={() => setVisible(!visible)}>
+                    {visible ? <Eye size={20} color="#64748b" /> : <EyeOff size={20} color="#64748b" />}
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View className="mb-6">
+                <Text className="text-slate-600 font-bold mb-2 ml-1">Address</Text>
+                <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
+                  <TextInput
+                    placeholder="10.0.0.2/24"
+                    value={config.address}
+                    className="flex-1 text-slate-900 text-base h-12"
+                    placeholderTextColor="#a9a9a9"
+                    onChangeText={(value) => setConfig({ ...config, address: value })}
+                  />
+                </View>
+              </View>
+
+              <View className="mb-6">
+                <Text className="text-slate-600 font-bold mb-2 ml-1">DNS (Optional)</Text>
+                <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
+                  <TextInput
+                    placeholder="8.8.8.8, 1.1.1.1"
+                    value={config.dns}
+                    className="flex-1 text-slate-900 text-base h-12"
+                    placeholderTextColor="#a9a9a9"
+                    onChangeText={(value) => setConfig({ ...config, dns: value })}
+                  />
+                </View>
+              </View>
             </View>
-          </View>
 
-          <View className="mb-6">
-            <Text className="text-slate-600 font-bold mb-2 ml-1">
-              Private Key
-            </Text>
-            <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
-              <TextInput 
-                secureTextEntry={!visible}
-                value={config.private_key}
-                className="flex-1 text-slate-900 text-base"
-                placeholder='bmXOC+pV1u3zDad9eTB+'
-                placeholderTextColor="#a9a9a9"
-                onChangeText={(value) => setConfig({...config, private_key: value})}
-              />
-              <TouchableOpacity className="ml-3" onPress={() => setVisible(!visible)}>
-                { visible ? <Eye size={20} color="#64748b" /> : <EyeOff size={20} color="#64748b" /> }
+            {/* Peer Settings Section */}
+            <View className="mt-4">
+              <Text className="text-slate-900 text-xl font-bold mb-6">Peer</Text>
+
+              <View className="mb-6">
+                <Text className="text-slate-600 font-bold mb-2 ml-1">Public Key</Text>
+                <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
+                  <TextInput
+                    placeholder="bmXOC+pV1u3zDad9eTB+"
+                    value={config.public_key}
+                    className="flex-1 text-slate-900 text-base h-12"
+                    placeholderTextColor="#a9a9a9"
+                    onChangeText={(value) => setConfig({ ...config, public_key: value })}
+                  />
+                </View>
+              </View>
+
+              <View className="mb-6">
+                <Text className="text-slate-600 font-bold mb-2 ml-1">Allowed IPs</Text>
+                <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
+                  <TextInput
+                    placeholder="0.0.0.0/0,::/0"
+                    value={config.allowed}
+                    className="flex-1 text-slate-900 text-base h-12"
+                    placeholderTextColor="#a9a9a9"
+                    onChangeText={(value) => setConfig({ ...config, allowed: value })}
+                  />
+                </View>
+              </View>
+
+              <View className="mb-6">
+                <Text className="text-slate-600 font-bold mb-2 ml-1">Endpoint</Text>
+                <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
+                  <TextInput
+                    placeholder="0.0.0.0"
+                    value={config.endpoint}
+                    className="flex-1 text-slate-900 text-base h-12"
+                    placeholderTextColor="#a9a9a9"
+                    onChangeText={(value) => setConfig({ ...config, endpoint: value })}
+                  />
+                </View>
+              </View>
+            </View>
+
+            {/* SAVE BUTTON */}
+            <View className="py-4">
+              <TouchableOpacity
+                activeOpacity={0.9}
+                className="bg-black rounded-2xl py-5 flex-row items-center justify-center shadow-lg shadow-black/20"
+                onPress={saveConfiguration}
+              >
+                <Save size={20} color="white" strokeWidth={2.5} />
+                <Text className="text-white font-bold text-lg ml-2">Save Configuration</Text>
               </TouchableOpacity>
-              {/* <TouchableOpacity className="ml-4">
-                <RefreshCw size={20} color="#1e293b" />
-              </TouchableOpacity> */}
             </View>
           </View>
-
-          <View className="mb-6">
-            <Text className="text-slate-600 font-bold mb-2 ml-1">
-              Address
-            </Text>
-            <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
-              <TextInput
-                placeholder='10.0.0.2'
-                value={config.address}
-                className="flex-1 text-slate-900 text-base"
-                placeholderTextColor="#a9a9a9"
-                onChangeText={(value) => setConfig({...config, address: value})}
-              />
-            </View>
-          </View>
-
-          <View className="mb-6">
-            <Text className="text-slate-600 font-bold mb-2 ml-1">
-              DNS (Optional)
-            </Text>
-            <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
-              <TextInput
-                placeholder='8.8.8.8, 1.1.1.1'
-                value={config.dns}
-                className="flex-1 text-slate-900 text-base"
-                placeholderTextColor="#a9a9a9"
-                onChangeText={(value) => setConfig({...config, dns: value})}
-              />
-            </View>
-          </View>
-        </View>
-
-        {/* Peer Settings Section */}
-        <View className="mt-4">
-          <Text className="text-slate-900 text-xl font-bold mb-6">
-            Peer
-          </Text>
-
-          <View className="mb-6">
-            <Text className="text-slate-600 font-bold mb-2 ml-1">
-              Public Key
-            </Text>
-            <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
-              <TextInput 
-                placeholder="bmXOC+pV1u3zDad9eTB+"
-                value={config.public_key}
-                className="flex-1 text-slate-900 text-base"
-                placeholderTextColor="#a9a9a9"
-                scrollEnabled
-                onChangeText={(value) => setConfig({...config, public_key: value})}
-              />
-            </View>
-          </View>
-
-          <View className="mb-6">
-            <Text className="text-slate-600 font-bold mb-2 ml-1">
-              Allowed IPs
-            </Text>
-            <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
-              <TextInput
-                placeholder='0.0.0.0/0,::/0'
-                value={config.allowed}
-                className="flex-1 text-slate-900 text-base"
-                placeholderTextColor="#a9a9a9"
-                onChangeText={(value) => setConfig({...config, allowed: value})}
-              />
-            </View>
-          </View>
-
-          <View className="mb-6">
-            <Text className="text-slate-600 font-bold mb-2 ml-1">
-              Endpoint
-            </Text>
-            <View className="bg-white px-5 py-1 rounded-2xl border border-slate-200 flex-row items-center">
-              <TextInput
-                placeholder='0.0.0.0'
-                value={config.endpoint}
-                className="flex-1 text-slate-900 text-base"
-                placeholderTextColor="#a9a9a9"
-                onChangeText={(value) => setConfig({...config, endpoint: value})}
-              />
-            </View>
-          </View>
-        </View>
-        
-        <View className="bg-slate-100/80 px-6 py-8">
-          <TouchableOpacity 
-            activeOpacity={0.9}
-            className="bg-black rounded-2xl py-5 flex-row items-center justify-center shadow-lg shadow-black/20"
-            onPress={saveConfiguration}
-          >
-            <Save size={20} color="white" strokeWidth={2.5} />
-            <Text className="text-white font-bold text-lg ml-2">
-              Save Configuration
-            </Text>
-          </TouchableOpacity>
-        </View>
         </ScrollView>
       </KeyboardAvoidingView>
 
