@@ -157,7 +157,9 @@
         "path": "start",
         "authentication": "jwtAuth",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -180,7 +182,9 @@
         "path": "status",
         "authentication": "jwtAuth",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -204,7 +208,9 @@
         "path": "add",
         "authentication": "jwtAuth",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -246,7 +252,9 @@
         "path": "stop",
         "authentication": "jwtAuth",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -284,7 +292,9 @@
         "httpMethod": "POST",
         "path": "remove",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -336,7 +346,9 @@
         "path": "block",
         "authentication": "jwtAuth",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -394,7 +406,9 @@
         "path": "unblock",
         "authentication": "jwtAuth",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -939,7 +953,9 @@
         "path": "peers",
         "authentication": "jwtAuth",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -1301,7 +1317,9 @@
         "path": "factory-reset",
         "authentication": "jwtAuth",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -2475,7 +2493,7 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "675ac6bb-e5fd-4a7d-b8ed-ec10b8b48dd5",
+  "versionId": "0a3ff8f3-9ee6-4dcf-ba74-b69bb1a35fe9",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b2f4e3f5d7a81ba1a3e97c02c033b0f98cd51a2bdec396699ffdae71ab8ebeee"
