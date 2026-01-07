@@ -62,55 +62,66 @@ export default function Configuration() {
   };
 
   let saveConfiguration = async() => {
-    try {
-      let template = `[Interface]
-      PrivateKey = ${config.private_key}
-      Address = ${config.address}
-      DNS = ${config.dns}
+    if((config.name != null && config.name.length > 0) &&
+       (config.private_key != null && config.private_key.length > 0) &&
+       (config.address != null && config.address.length > 0) &&
+       (config.public_key != null && config.public_key.length > 0) &&
+       (config.allowed != null && config.allowed.length > 0) &&
+       (config.endpoint != null && config.endpoint.length > 0)
+    ){
+      try {
+        let template = `[Interface]
+        PrivateKey = ${config.private_key}
+        Address = ${config.address}
+        DNS = ${config.dns}
 
-      [Peer]
-      PublicKey = ${config.public_key}
-      AllowedIPs = ${config.allowed}
-      Endpoint = ${config.endpoint}
-      PersistentKeepalive = 25`
+        [Peer]
+        PublicKey = ${config.public_key}
+        AllowedIPs = ${config.allowed}
+        Endpoint = ${config.endpoint}
+        PersistentKeepalive = 25`
 
-      let profileList = await AsyncStorage.getItem('profiles')
+        let profileList = await AsyncStorage.getItem('profiles')
 
-      if(profileList != null){
-        profileList = JSON.parse(profileList)
-        profileList.push({
-          name: config['name'],
-          address: config.address,
-          config: template
-        })
-        const profiles = JSON.stringify(profileList);
-        await AsyncStorage.setItem('profiles', profiles);
-      }
-      else{
-        const profiles = JSON.stringify([
-          {
+        if(profileList != null){
+          profileList = JSON.parse(profileList)
+          profileList.push({
             name: config['name'],
             address: config.address,
             config: template
-          }
-        ]);
-        await AsyncStorage.setItem('profiles', profiles); 
+          })
+          const profiles = JSON.stringify(profileList);
+          await AsyncStorage.setItem('profiles', profiles);
+        }
+        else{
+          const profiles = JSON.stringify([
+            {
+              name: config['name'],
+              address: config.address,
+              config: template
+            }
+          ]);
+          await AsyncStorage.setItem('profiles', profiles); 
+        }
+
+        setConfig({
+          name: null,
+          private_key: null,
+          address: null,
+          dns: '8.8.8.8',
+          public_key: null,
+          allowed: null,
+          endpoint: null
+        })
+
+        Alert.alert('Profile added successfully')
+        
+      } catch (e) {
+        Alert.alert('Something went wrong')
       }
-
-      setConfig({
-        name: null,
-        private_key: null,
-        address: null,
-        dns: '8.8.8.8',
-        public_key: null,
-        allowed: null,
-        endpoint: null
-      })
-
-      Alert.alert('Profile added successfully 👍🏻')
-      
-    } catch (e) {
-      Alert.alert('Something went wrong 😞')
+    }
+    else{
+      Alert.alert('Fill in all required fields. Optional fields can be left empty.')
     }
   }
 

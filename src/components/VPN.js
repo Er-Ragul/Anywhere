@@ -154,6 +154,8 @@ export default function VPN() {
         await AsyncStorage.setItem('config', JSON.stringify(configCopy))
         await AsyncStorage.removeItem('startTime')
         setIsConnected(false)
+        clearInterval(timerRef.current);
+        clearInterval(statsIntervalRef.current);
       }
       else{
         console.log('Connecting');

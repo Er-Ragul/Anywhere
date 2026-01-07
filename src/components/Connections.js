@@ -29,7 +29,6 @@ import { useSelector, useDispatch } from 'react-redux';
 export default function Connections() {
   let navigation = useNavigation()
   let [profiles, setProfiles] = useState([])
-  let [power, setPower] = useState(false)
   let [config, setConfig] = useState(null)
   let duration = useSelector((state) => state.variable.duration)
   let transfer = useSelector((state) => state.variable.transfer)
@@ -43,7 +42,6 @@ export default function Connections() {
     let profile = await AsyncStorage.getItem('config')
     if (profile != null){
       setConfig(JSON.parse(profile))
-      setPower(profile.connected)
     }
     else{
       console.log('No connection profile loaded');
@@ -88,7 +86,6 @@ export default function Connections() {
         let profileCopy = config
         profileCopy['connected'] = false
         await AsyncStorage.setItem('config', JSON.stringify(profileCopy))
-        setPower(false)
       }
       else{
         console.log('Connecting');
@@ -97,7 +94,6 @@ export default function Connections() {
         let profileCopy = config
         profileCopy['connected'] = true
         await AsyncStorage.setItem('config', JSON.stringify(profileCopy))
-        setPower(true)
       }
     } catch (e) {
         console.error(e);
