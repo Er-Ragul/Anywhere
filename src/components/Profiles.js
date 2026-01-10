@@ -60,7 +60,7 @@ export default function Profiles() {
 
   const serverStatus = async() => {
     try{
-      let result = await axios.get(`http://${serverRef.current.endpoint}/webhook/status`,{
+      let result = await axios.get(`https://${serverRef.current.endpoint}/webhook/status`,{
         headers: {
           'Authorization': `Bearer ${serverRef.current.token}`,
           'Content-Type': 'application/json'
@@ -85,7 +85,7 @@ export default function Profiles() {
 
   let getClients = async() => {
     try {
-      let result = await axios.get(`http://${serverRef.current.endpoint}/webhook/peers`,{
+      let result = await axios.get(`https://${serverRef.current.endpoint}/webhook/peers`,{
         headers: {
           'Authorization': `Bearer ${serverRef.current.token}`,
           'Content-Type': 'application/json'
@@ -106,7 +106,7 @@ export default function Profiles() {
     setLoader(true)
     if(running){
       try {
-        let result = await axios.get(`http://${serverRef.current.endpoint}/webhook/stop`,{
+        let result = await axios.get(`https://${serverRef.current.endpoint}/webhook/stop`,{
           headers: {
             'Authorization': `Bearer ${serverRef.current.token}`,
             'Content-Type': 'application/json'
@@ -126,7 +126,7 @@ export default function Profiles() {
     }
     else{
       try {
-        let result = await axios.get(`http://${serverRef.current.endpoint}/webhook/start`,{
+        let result = await axios.get(`https://${serverRef.current.endpoint}/webhook/start`,{
           headers: {
             'Authorization': `Bearer ${serverRef.current.token}`,
             'Content-Type': 'application/json'
@@ -155,7 +155,7 @@ export default function Profiles() {
     console.log(nameRef.current)
     if(nameRef.current != null){
       try {
-        let result = await axios.post(`http://${serverRef.current.endpoint}/webhook/add`, {name: nameRef.current}, {
+        let result = await axios.post(`https://${serverRef.current.endpoint}/webhook/add`, {name: nameRef.current}, {
           headers: {
             'Authorization': `Bearer ${serverRef.current.token}`,
             'Content-Type': 'application/json'
@@ -195,7 +195,7 @@ export default function Profiles() {
     }
 
     try {
-      let result = await axios.post(`http://${serverRef.current.endpoint}/webhook/remove`, info, {
+      let result = await axios.post(`https://${serverRef.current.endpoint}/webhook/remove`, info, {
         headers: {
           'Authorization': `Bearer ${serverRef.current.token}`,
           'Content-Type': 'application/json'
@@ -225,7 +225,7 @@ export default function Profiles() {
       }
 
       try {
-        let result = await axios.post(`http://${serverRef.current.endpoint}/webhook/unblock`, info, {
+        let result = await axios.post(`https://${serverRef.current.endpoint}/webhook/unblock`, info, {
           headers: {
             'Authorization': `Bearer ${serverRef.current.token}`,
             'Content-Type': 'application/json'
@@ -252,7 +252,7 @@ export default function Profiles() {
       }
 
       try {
-        let result = await axios.post(`http://${serverRef.current.endpoint}/webhook/block`, info, {
+        let result = await axios.post(`https://${serverRef.current.endpoint}/webhook/block`, info, {
           headers: {
             'Authorization': `Bearer ${serverRef.current.token}`,
             'Content-Type': 'application/json'
@@ -284,7 +284,7 @@ export default function Profiles() {
   let factoryReset = async() => {
     try {
       await AsyncStorage.removeItem('anywhere-hub')
-      let result = await axios.get(`http://${serverRef.current.endpoint}/webhook/factory-reset`, {
+      let result = await axios.get(`https://${serverRef.current.endpoint}/webhook/factory-reset`, {
         headers: {
           'Authorization': `Bearer ${serverRef.current.token}`,
           'Content-Type': 'application/json'

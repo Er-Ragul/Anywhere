@@ -66,7 +66,7 @@ export default function Authentication(){
 
         if(hub != null){
           try{
-            let response = await axios.post(`http://${fqdn}/webhook/register`, {
+            let response = await axios.post(`https://${fqdn}/webhook/register`, {
               uid: JSON.parse(hub)['uid'],
               password: password,
             })
@@ -88,7 +88,7 @@ export default function Authentication(){
         }
         else{
           try{
-            let response = await axios.post(`http://${fqdn}/webhook/register`, {
+            let response = await axios.post(`https://${fqdn}/webhook/register`, {
               interface: "wg0",
               endpoint: fqdn,
               password: password,
