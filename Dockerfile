@@ -17,7 +17,10 @@ RUN mkdir -p /etc/wireguard
 WORKDIR /scripts
 
 # Copy all shell scripts
-COPY . .
+COPY ./scripts .
+
+# Enable execute permission
+RUN chmod +x *
 
 # Generate SSH host keys
 RUN ssh-keygen -A
