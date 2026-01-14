@@ -41,7 +41,9 @@ Run the following command to **install and configure the WireGuard VPN server an
 
 ### Run the setup script
 ```bash
-curl -sfL https://raw.githubusercontent.com/Er-Ragul/Anywhere/refs/heads/server/anywhere-setup.sh | sh -
+curl -O https://raw.githubusercontent.com/Er-Ragul/Anywhere/refs/heads/server/anywhere-setup.sh
+chmod +x anywhere-setup.sh
+sudo ./anywhere-setup.sh
 ```
 
 > **The script will:**
