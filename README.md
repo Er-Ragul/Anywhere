@@ -13,8 +13,8 @@ Ensure these are installed and configured **before** starting:
 
 ## 1. Project Initialization
 ```bash
-npx create-expo-app WireGuardApp
-cd WireGuardApp
+npx create-expo-app Anywhere
+cd Anywhere
 ```
 
 ## 2. Install Dependencies
@@ -34,7 +34,7 @@ npx expo prebuild --platform android
 This step involves creating Kotlin files. **Copy the code exactly** to avoid signature mismatch errors that cause build failures.
 
 ### 4.1 Create `WireGuardModule.kt`
-Path: `android/app/src/main/java/com/wireguardapp/WireGuardModule.kt`
+Path: `android/app/src/main/java/com/raguls/Anywhere/WireGuardModule.kt`
 
 > [!IMPORTANT]
 > ensuring `onActivityResult` has the signature `activity: Activity` (not `Activity?`) is critical.
@@ -57,20 +57,22 @@ import com.wireguard.android.backend.GoBackend
 import com.wireguard.android.backend.Tunnel
 import com.wireguard.config.Config
 import java.io.ByteArrayInputStream
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.WritableMap
 import java.nio.charset.StandardCharsets
 
 class WireGuardModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-    private var backend: GoBackend? = null
     private var pendingPromise: Promise? = null
     private var pendingName: String? = null
     private var pendingConfig: String? = null
 
     companion object {
         private const val REQUEST_CODE_VPN_PERMISSION = 1001
+        private var backend: GoBackend? = null // Singleton instance
+        private val tunnels = HashMap<String, Tunnel>() // Cache tunnel instances
     }
 
     private val activityEventListener: ActivityEventListener = object : BaseActivityEventListener() {
-        // ERROR PREVENTION: explicitly use 'Activity' (non-null), not 'Activity?'.
         override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?) {
             if (requestCode == REQUEST_CODE_VPN_PERMISSION) {
                 if (resultCode == Activity.RESULT_OK) {
@@ -104,8 +106,8 @@ class WireGuardModule(private val reactContext: ReactApplicationContext) : React
     private fun initializeBackend() {
         if (backend != null) return
         try {
-            backend = GoBackend(reactContext)
-            Log.d("WireGuardModule", "Backend initialized successfully")
+            backend = GoBackend(reactContext.applicationContext)
+            Log.d("WireGuardModule", "Backend initialized successfully (Singleton)")
         } catch (e: Exception) {
             Log.e("WireGuardModule", "Error initializing backend", e)
         }
@@ -125,7 +127,7 @@ class WireGuardModule(private val reactContext: ReactApplicationContext) : React
     @ReactMethod
     fun connect(name: String, configInterface: String, promise: Promise) {
         initializeBackend()
-        val backend = this.backend
+        val backend = WireGuardModule.backend
         if (backend == null) {
             promise.reject("BACKEND_ERROR", "WireGuard backend failed to initialize. Check logs.")
             return
@@ -158,12 +160,23 @@ class WireGuardModule(private val reactContext: ReactApplicationContext) : React
         try {
             val inputStream = ByteArrayInputStream(configInterface.toByteArray(StandardCharsets.UTF_8))
             val config = Config.parse(inputStream)
-            val tunnel = WgTunnel(name)
             
+            // Reuse existing tunnel object or create new one
+            var tunnel = tunnels[name]
+            if (tunnel == null) {
+                tunnel = WgTunnel(name)
+                tunnels[name] = tunnel
+                Log.d("WireGuardModule", "Created new tunnel instance for: $name")
+            } else {
+                Log.d("WireGuardModule", "Reusing existing tunnel instance for: $name")
+            }
+            
+            val finalTunnel = tunnel
+
             // Using a thread because setState might be blocking
             Thread {
                 try {
-                    backend.setState(tunnel, Tunnel.State.UP, config)
+                    backend.setState(finalTunnel, Tunnel.State.UP, config)
                     promise.resolve("CONNECTED")
                 } catch (e: BackendException) {
                     Log.e("WireGuardModule", "BackendException during connect", e)
@@ -180,32 +193,88 @@ class WireGuardModule(private val reactContext: ReactApplicationContext) : React
 
     @ReactMethod
     fun disconnect(name: String, promise: Promise) {
+        Log.d("WireGuardModule", "Disconnecting tunnel: $name")
         initializeBackend()
-         val backend = this.backend
+         val backend = WireGuardModule.backend
         if (backend == null) {
+            Log.e("WireGuardModule", "Backend is null during disconnect")
             promise.reject("BACKEND_ERROR", "WireGuard backend not initialized")
             return
         }
         
         try {
-            val tunnel = WgTunnel(name)
+            // Retrieve existing tunnel instance
+            var tunnel = tunnels[name]
+            if (tunnel == null) {
+                Log.w("WireGuardModule", "No cached tunnel found for $name. Creating temporary instance (May fail if backend requires identity).")
+                tunnel = WgTunnel(name)
+            } else {
+                Log.d("WireGuardModule", "Found cached tunnel instance for: $name")
+            }
+            
+            val finalTunnel = tunnel
+
              Thread {
                 try {
-                    backend.setState(tunnel, Tunnel.State.DOWN, null)
+                    Log.d("WireGuardModule", "Setting state to DOWN for $name")
+                    backend.setState(finalTunnel, Tunnel.State.DOWN, null)
+                    Log.d("WireGuardModule", "State set to DOWN successfully")
+                    
+                    try {
+                        val intent = Intent(reactContext.applicationContext, GoBackend.VpnService::class.java)
+                        val stopped = reactContext.applicationContext.stopService(intent)
+                        Log.d("WireGuardModule", "Triggered stopService explicitly. Result: $stopped")
+                    } catch (e: Exception) {
+                        Log.e("WireGuardModule", "Failed to stop service explicitly", e)
+                    }
+
                     promise.resolve("DISCONNECTED")
                 } catch (e: Exception) {
+                    Log.e("WireGuardModule", "Exception in disconnect thread", e)
                     promise.reject("DISCONNECT_FAIL", e)
+                } catch (e: Throwable) {
+                    Log.e("WireGuardModule", "Fatal error in disconnect thread", e)
+                    promise.reject("DISCONNECT_FATAL", "Fatal error: ${e.message}")
                 }
             }.start()
         } catch (e: Exception) {
+            Log.e("WireGuardModule", "Error starting disconnect thread", e)
             promise.reject("ERROR", e)
+        }
+    }
+
+    @ReactMethod
+    fun getStatistics(name: String, promise: Promise) {
+        initializeBackend()
+        val backend = WireGuardModule.backend
+        if (backend == null) {
+            promise.reject("BACKEND_ERROR", "Backend not initialized")
+            return
+        }
+
+        try {
+            var tunnel = tunnels[name]
+            if (tunnel == null) {
+                // If checking stats for a running tunnel not in our cache (e.g. after restart),
+                // we might need to recreate it. However, getStatistics might work with a new object 
+                // if it's just reading DB/Kernel stats by name. But safer to assume identity matters.
+                tunnel = WgTunnel(name)
+            }
+
+            val stats = backend.getStatistics(tunnel)
+            val map = Arguments.createMap()
+            map.putDouble("totalRx", stats.totalRx().toDouble())
+            map.putDouble("totalTx", stats.totalTx().toDouble())
+            promise.resolve(map)
+        } catch (e: Exception) {
+            promise.reject("STATS_ERROR", e.message, e)
         }
     }
 }
 ```
 
 ### 4.2 Create `WireGuardPackage.kt`
-Path: `android/app/src/main/java/com/wireguardapp/WireGuardPackage.kt`
+Path: `android/app/src/main/java/com/raguls/Anywhere/WireGuardPackage.kt`
 
 ```kotlin
 package com.wireguardapp
@@ -227,7 +296,7 @@ class WireGuardPackage : ReactPackage {
 ```
 
 ### 4.3 Register Package in `MainApplication.kt`
-Path: `android/app/src/main/java/com/wireguardapp/MainApplication.kt`
+Path: `android/app/src/main/java/com/raguls/Anywhere/MainApplication.kt`
 
 Add the package to the list.
 
@@ -271,6 +340,13 @@ dependencies {
 ## 6. Android Manifest
 Path: `android/app/src/main/AndroidManifest.xml`
 
+Include the xmlns:tools attribute **inside the opening `<manifest>` tag**, along with the xmlns:android declaration.
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
+```
+
 Add the VPN service entry **inside the `<application>` tag**.
 
 ```xml
@@ -289,7 +365,18 @@ Also ensure permissions are present:
 <uses-permission android:name="android.permission.INTERNET"/>
 ```
 
-## 7. Build and Run
+## 7 Create `local.properties`
+Path: `android/local.properties`
+
+Add the **`SDK`** and **`NDK`** paths available on your system.
+
+```bash
+sdk.dir=C:\\Users\\<username>\\AppData\\Local\\Android\\Sdk
+ndk.dir=C:\\Users\\<username>\\AppData\\Local\\Android\\Sdk\\ndk\\27.1.12297006
+```
+
+
+## 8. Build and Run
 ```bash
 npm run android
 ```
