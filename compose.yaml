@@ -1,4 +1,6 @@
-version: "3.8"
+networks:
+  anywhere-network:
+    driver: bridge
 
 services:
   traefik:
@@ -22,6 +24,8 @@ services:
     volumes:
       - ${BASE_DIR}/traefik_data:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - anywhere-network
 
   n8n:
     image: docker.n8n.io/n8nio/n8n
@@ -50,6 +54,7 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
       - N8N_RUNNERS_ENABLED=true
+      - N8N_ENCRYPTION_KEY=qmx+iJ1ajE9DDQEi7gPqI4y3wHzQJGcv
       - NODE_ENV=production
       - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
@@ -57,6 +62,8 @@ services:
     volumes:
       - ${BASE_DIR}/n8n_data:/home/node/.n8n
       - ${BASE_DIR}/local-files:/files
+    networks:
+      - anywhere-network
 
   mongodb:
     image: mongodb/mongodb-community-server
@@ -64,11 +71,14 @@ services:
     restart: always
     volumes:
       - ${BASE_DIR}/mongodb:/data/db
+      - ${BASE_DIR}/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
     ports:
       - "27017:27017"
+    networks:
+      - anywhere-network
 
   anywhere-vpn:
     image: anywhere
@@ -84,3 +94,5 @@ services:
       net.ipv4.ip_forward: "1"
     volumes:
       - /lib/modules:/lib/modules:ro
+    networks:
+      - anywhere-network
