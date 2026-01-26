@@ -91,6 +91,7 @@ sudo docker cp anywhere.json n8n:/tmp/anywhere.json
 sudo docker exec -it n8n n8n import:credentials --input=/tmp/credentials.json
 sudo docker exec -it n8n n8n import:workflow --input=/tmp/anywhere.json
 sudo docker exec -it n8n n8n publish:workflow --id=9lyTjrgI6u2iExuQAmbWh
+sudo docker restart n8n
 
 echo ""
 
